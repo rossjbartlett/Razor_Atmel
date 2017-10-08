@@ -138,18 +138,44 @@ State Machine Function Definitions
 static void UserApp1SM_Idle(void)
 {
   static u32 u32Counter = 0;
+  static u32 u32Counter2sec=0;
   static bool bLightIsOn = FALSE;
+  static bool bSpeedingUp = TRUE;
+  //when changed to >1000, light just stays on?
+  static u32 u32blinkRate_ms = 1000; // blink rate: 1.024Hz. blinks every 1.024sec
   /* Increment u32Counter every 1ms cycle */
   u32Counter++;
+  u32Counter2sec++;
   
   /* Check and roll over */
-  if(u32Counter == COUNTER_LIMIT_MS)
+  if(u32Counter == u32blinkRate_ms)
   {
     u32Counter = 0;
     if (bLightIsOn) HEARTBEAT_OFF();
     else HEARTBEAT_ON();
     bLightIsOn = !bLightIsOn;
   }
+  
+  /* speed up blink every 2s*/
+  if ( bSpeedingUp && u32Counter2sec == 2000 )
+  {
+    /* to blink twice as often, need to div by 2 */
+    u32blinkRate_ms /= 2;
+      u32Counter2sec = 0;
+      if (u32blinkRate_ms<100) bSpeedingUp = !bSpeedingUp;
+  }
+  // slow down blink every 2s
+  else if ( !bSpeedingUp && u32Counter2sec == 2000 )
+  {
+    u32blinkRate_ms *= 2;
+      u32Counter2sec = 0;
+       if (u32blinkRate_ms>1000) bSpeedingUp = !bSpeedingUp;
+
+  }
+  
+  //why does light stay on when speeding up for 2nd time?
+  //blink
+  
 } /* end UserApp1SM_Idle() */
     
 
