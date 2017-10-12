@@ -141,11 +141,10 @@ static void UserApp1SM_Idle(void)
   static u32 u32Counter2sec=0;
   static bool bLightIsOn = FALSE;
   
-  //when changed to >1000, light just stays on? I want it to be 1024.
-  static u32 u32blinkRate_ms = 1000; // blink rate: 1.024Hz. blinks every 1.024sec
+  static u32 u32blinkRate_ms = 1024; // blink rate: 1.024Hz. blinks every 1.024sec
  
   /* Increment u32Counter every 1ms cycle */
-  u32Counter++;
+ 
   u32Counter2sec++;
   
   /* Check and roll over */
@@ -156,18 +155,21 @@ static void UserApp1SM_Idle(void)
     else HEARTBEAT_ON();
     bLightIsOn = !bLightIsOn;
   }
-  
+   u32Counter++; //move this after the check 
   /* speed up blink every 2s*/
+
+
   if (u32Counter2sec == 2000 )
   {
     /* to blink twice as often, need to div by 2 */
     u32blinkRate_ms /= 2;
       u32Counter2sec = 0;
-     
-  }
+     u32Counter=0; //added a reset here
+  } 
+
  
   
-  //why does light turn off eventually? shouldnt it stay on forever?
+  //why does light turn off eventually? then blinks ever 2s
 
 } /* end UserApp1SM_Idle() */
     
