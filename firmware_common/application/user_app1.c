@@ -99,7 +99,7 @@ void UserApp1Initialize(void)
     UserApp1_StateMachine = UserApp1SM_Error;
   }
 
-  //Binary Counter (4-Bit)
+  //Binary Counter (multi-bit)
   
   
      /* All discrete LEDs to off */
@@ -163,7 +163,18 @@ static void UserApp1SM_Idle(void)
 {
     static u16 u16BlinkCount = 0;
     static u8 u8Counter = 0;
-   
+    const u16 u16bitAmount = 8; // x-bit counter.
+    u32 u32highestNum =1; //ex. 4-bit's highestNum is 15
+    
+    //pow() function to set highest num = 2^bitAmount -1
+    for(int i=0 ; i<u16bitAmount ; i++)
+    {
+      u32highestNum*=2;
+    }
+    u32highestNum-=1;
+    
+    
+    
     u16BlinkCount++;
     if(u16BlinkCount == 500)//change every .5s
     {
@@ -171,7 +182,7 @@ static void UserApp1SM_Idle(void)
       
       /* Update the counter and roll at 16 */
       u8Counter++;
-      if(u8Counter == 16)//binary count up to 15 (4bit)
+      if(u8Counter > u32highestNum)//ex. binary count up to 15 (4bit)
       {
         u8Counter = 0;
       }
@@ -180,7 +191,7 @@ static void UserApp1SM_Idle(void)
   
      /* Parse the current count to set the LEDs.  
       RED is bit 0, ORANGE is bit 1, 
-      YELLOW is bit 2, GREEN is bit 3. */
+      YELLOW is bit 2, GREEN is bit 3, CYAN,BLUE,PURPLE,WHITE. */
     
     if(u8Counter & 0x01)
     {
@@ -216,6 +227,42 @@ static void UserApp1SM_Idle(void)
     else
     {
       LedOff(GREEN);
+    }
+    //more
+    if(u8Counter & 0x10) // 0x10 in hex= 16 in decimal 
+    {
+      LedOn(CYAN);
+    }
+    else
+    {
+      LedOff(CYAN);
+    }
+
+    if(u8Counter & 0x20) // 32 decimal
+    {
+      LedOn(BLUE);
+    }
+    else
+    {
+      LedOff(BLUE);
+    }
+
+    if(u8Counter & 0x40) //64 decimal
+    {
+      LedOn(PURPLE);
+    }
+    else
+    {
+      LedOff(PURPLE);
+    }
+
+    if(u8Counter & 0x80) //128 decimal
+    {
+      LedOn(WHITE);
+    }
+    else
+    {
+      LedOff(WHITE);
     }
     
 } /* end UserApp1SM_Idle() */
