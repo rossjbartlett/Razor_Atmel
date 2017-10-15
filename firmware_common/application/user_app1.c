@@ -99,24 +99,28 @@ void UserApp1Initialize(void)
     UserApp1_StateMachine = UserApp1SM_Error;
   }
 
+  //Binary Counter (4-Bit)
   
   
-  
-   /* Initialize all unused LEDs to off */
+     /* All discrete LEDs to off */
+  LedOff(WHITE);
+  LedOff(PURPLE);
+  LedOff(BLUE);
   LedOff(CYAN);
   LedOff(GREEN);
   LedOff(YELLOW);
   LedOff(ORANGE);
+  LedOff(RED);
   
-  /* Turn on desired LEDs using the ON function */
-  LedOn(BLUE);
-  LedOn(PURPLE);
+  /* Backlight to white (R+G+B = W). */  
+  //if not doing white, must turn off all first bc they default on
+  LedOff(LCD_RED);
+  LedOff(LCD_GREEN);
+  LedOff(LCD_BLUE);
 
-  /* Set an LED to blink at 2Hz */
-  LedBlink(RED, LED_2HZ);
-
-  /* Set an LED to the dimmest state we have (5% duty cycle) */
-  LedPWM(WHITE, LED_PWM_5);
+  //LedOn(LCD_RED);
+  //LedOn(LCD_GREEN);
+  LedOn(LCD_BLUE);
   
   
   
@@ -158,14 +162,62 @@ State Machine Function Definitions
 static void UserApp1SM_Idle(void)
 {
     static u16 u16BlinkCount = 0;
-
+    static u8 u8Counter = 0;
+   
     u16BlinkCount++;
-    if(u16BlinkCount == 500)
+    if(u16BlinkCount == 500)//change every .5s
     {
       u16BlinkCount = 0;
-      LedToggle(PURPLE);
+      
+      /* Update the counter and roll at 16 */
+      u8Counter++;
+      if(u8Counter == 16)//binary count up to 15 (4bit)
+      {
+        u8Counter = 0;
+      }
+      
     }
   
+     /* Parse the current count to set the LEDs.  
+      RED is bit 0, ORANGE is bit 1, 
+      YELLOW is bit 2, GREEN is bit 3. */
+    
+    if(u8Counter & 0x01)
+    {
+      LedOn(RED);
+    }
+    else
+    {
+      LedOff(RED);
+    }
+
+    if(u8Counter & 0x02)
+    {
+      LedOn(ORANGE);
+    }
+    else
+    {
+      LedOff(ORANGE);
+    }
+
+    if(u8Counter & 0x04)
+    {
+      LedOn(YELLOW);
+    }
+    else
+    {
+      LedOff(YELLOW);
+    }
+
+    if(u8Counter & 0x08)
+    {
+      LedOn(GREEN);
+    }
+    else
+    {
+      LedOff(GREEN);
+    }
+    
 } /* end UserApp1SM_Idle() */
     
 
