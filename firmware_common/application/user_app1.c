@@ -102,21 +102,12 @@ void UserApp1Initialize(void)
   
   
   
-   /* Initialize all unused LEDs to off */
-  LedOff(CYAN);
-  LedOff(GREEN);
-  LedOff(YELLOW);
-  LedOff(ORANGE);
-  
-  /* Turn on desired LEDs using the ON function */
-  LedOn(BLUE);
-  LedOn(PURPLE);
+   /* Initialize all LEDs to off */
+	for(LedNumberType i=0; i<=RED ; i++)
+  {
+    LedOff(i);
+  }
 
-  /* Set an LED to blink at 2Hz */
-  LedBlink(RED, LED_2HZ);
-
-  /* Set an LED to the dimmest state we have (5% duty cycle) */
-  LedPWM(WHITE, LED_PWM_5);
   
   
   
@@ -158,13 +149,34 @@ State Machine Function Definitions
 static void UserApp1SM_Idle(void)
 {
     static u16 u16BlinkCount = 0;
-
+    static LedRateType brightness = 0;
+    static bool goingUp = TRUE;
+    
     u16BlinkCount++;
-    if(u16BlinkCount == 500)
+    if(u16BlinkCount == 40)//assignment wants 40
     {
       u16BlinkCount = 0;
-      LedToggle(PURPLE);
+      
+      if (goingUp) brightness++;
+      else brightness--;
+      
+      if (brightness>=20) //20 steps from 0 to 100 (step=5)
+      {
+        goingUp=FALSE;
+      }
+      else if (brightness<=0) 
+      {
+        goingUp=TRUE;
+      }
+      
+      for(LedNumberType i=0; i<=RED ; i++)
+      {
+        LedPWM(i,brightness);
+      }
+
     }
+    
+ 
   
 } /* end UserApp1SM_Idle() */
     
