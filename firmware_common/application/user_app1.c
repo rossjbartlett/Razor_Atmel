@@ -150,81 +150,153 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-  /* Program: LEDs alternate between 2 fade patterns:
-   * 1. Alternate Brightening LED, Dimming LED. Red Backlight
+  /* Program: LEDs alternate between 3 patterns:
+   * 1. Alternate Brightening LED, Dimming LED. GREEN Backlight
   *  2. Half LEDs brightening, Half LEDs dimming. Blue Backlight
+  *  3. Knight Rider 
   */
   
+  //Variables for all patterns
     static u16 u16BlinkCount = 0;
-    static u16 u16patternTimer = 0;
+    static u16 u16patternTimer = 0;  
     const u16 u16patternLength = 5000;//switch patterns every 5s
+   
+    //Pattern 1 and 2 variables
+     static u16 u16BlinkRate1 = 40;
+      //group 1 of LEDs start dim, brighten up
+      static LedRateType brightness = 0;
+      static bool goingUp = TRUE;
+      //group 2 of LEDs start bright, dim down
+      static LedRateType brightness2 = 20;
+      static bool goingUp2 = FALSE;
     
-    //group 1 of LEDs start dim, brighten up
-    static LedRateType brightness = 0;
-    static bool goingUp = TRUE;
-    //group 2 of LEDs start bright, dim down
-    static LedRateType brightness2 = 20;
-    static bool goingUp2 = FALSE;
+    //Pattern 3 Variables
+       static u16 u16BlinkRate3 = 100;
+      static LedNumberType myLed= 0;//White=1st LED = enum 0
+      static LedNumberType prevLed=-1;
+      static bool movingRight=TRUE;
+      static bool firstTimeInPattern3=TRUE;//first time in pattern 3 PER SEQUENCE 
     
     u16BlinkCount++;
     u16patternTimer++;
     
-    if(u16BlinkCount == 40)//speed of blinking 
-    {
-      u16BlinkCount = 0;
+   
       
-      if (goingUp) brightness++;
-      else brightness--;
-      if (goingUp2) brightness2++;
-      else brightness2--;
-      
-      if (brightness>=20) //20 steps from 0 to 100 (step=5)
+      if(u16patternTimer<=u16patternLength*2)//patterns 1 and 2 
       {
-        goingUp=FALSE;
-      }
-      else if (brightness<=0)
-      {
-        goingUp=TRUE;
-      }
-      
-       if (brightness2>=20) //20 steps from 0 to 100 (step=5)
-      {
-        goingUp2=FALSE;
-      }
-      else if (brightness2<=0)
-      {
-        goingUp2=TRUE;
-      }
-      
-      if(u16patternTimer< u16patternLength) 
-      {
-        //Red Backlight
-        LedOff(LCD_GREEN);
-        LedOff(LCD_BLUE);
-        LedOn(LCD_RED);
-        // pattern1: Alternate Brightening LED, Dimming LED
-        for(LedNumberType ledNum = 0; ledNum<8 ; ledNum++)
+     
+         if(u16BlinkCount >= u16BlinkRate1)//speed of blinking 
         {
-         if (ledNum%2==0) LedPWM(ledNum,brightness); //even LEDs brighten
-         else LedPWM(ledNum,brightness2); // odd LEDs dim
+          u16BlinkCount = 0;
+          if (goingUp) brightness++;
+          else brightness--;
+          if (goingUp2) brightness2++;
+          else brightness2--;
+          
+          if (brightness>=20) //20 steps from 0 to 100 (step=5)
+          {
+            goingUp=FALSE;
+          }
+          else if (brightness<=0)
+          {
+            goingUp=TRUE;
+          }
+          
+           if (brightness2>=20) //20 steps from 0 to 100 (step=5)
+          {
+            goingUp2=FALSE;
+          }
+          else if (brightness2<=0)
+          {
+            goingUp2=TRUE;
+          }
+          
+          if(u16patternTimer< u16patternLength) //pattern1
+          {
+            //Green Backlight
+            LedOff(LCD_RED);
+            LedOff(LCD_BLUE);
+            LedOn(LCD_GREEN);
+            
+            for(LedNumberType ledNum = 0; ledNum<8 ; ledNum++)
+            {
+             if (ledNum%2==0) LedPWM(ledNum,brightness); //even LEDs brighten
+             else LedPWM(ledNum,brightness2); // odd LEDs dim
+            }
+          }
+          else //pattern 2
+          {
+            //BLUE Backlight
+            LedOff(LCD_RED);
+            LedOff(LCD_GREEN);
+            LedOn(LCD_BLUE);
+            
+           for(LedNumberType ledNum = 0; ledNum<8 ; ledNum++)
+            {
+             if (ledNum<4) LedPWM(ledNum,brightness);//left LEDs brighten
+             else LedPWM(ledNum,brightness2);//right LEDs dim
+            }
+          }
         }
-      }
-      else
-      {
-        //BLUE Backlight
-        LedOff(LCD_RED);
-        LedOff(LCD_GREEN);
-        LedOn(LCD_BLUE);
-        // pattern2: Half LEDs brightening, Half LEDs dimming
-       for(LedNumberType ledNum = 0; ledNum<8 ; ledNum++)
-        {
-         if (ledNum<4) LedPWM(ledNum,brightness);//left LEDs brighten
-         else LedPWM(ledNum,brightness2);//right LEDs dim
-        }
-      }
+      }//end of pattern 1 or 2
       
-      if(u16patternTimer > 2*u16patternLength) u16patternTimer=0;
-    }
+      else if (u16patternTimer<u16patternLength*3)//3rd pattern 
+      {
+         if (firstTimeInPattern3)
+         {//if starting pattern 3, need to turn off all first so that it is clean 
+           for(LedNumberType lednum=0; lednum<8;lednum++)
+           {
+             LedOff(lednum);
+           }
+           firstTimeInPattern3=FALSE;
+         }
+         
+         if(u16BlinkCount >= u16BlinkRate3) 
+          {
+            u16BlinkCount = 0;
+            
+           //RED Backlight
+            LedOff(LCD_GREEN);
+            LedOff(LCD_BLUE);
+            LedOn(LCD_RED);
+            
+            if (prevLed != -1) LedOff(prevLed);
+            LedToggle(myLed);
+            prevLed=myLed;
+            
+            if(movingRight)
+            {
+              myLed++;
+            }
+            else
+            {
+              myLed--;
+            }
+          
+           //Change Directions when at limits
+            if (myLed >= RED) //RED or 7 (last LED)
+            {
+              //myLed=RED;
+              movingRight=FALSE;
+            }
+            else if (myLed <=WHITE)
+            {
+            //  myLed=WHITE;
+              movingRight=TRUE;
+            }
+          }
+      }//end of pattern 3 
+      
+      else  //start sequence over
+      {
+        //reset pattern 3 varibles so it always starts at left
+          myLed= 0;
+          prevLed=-1;
+          movingRight=TRUE;
+          firstTimeInPattern3=TRUE;
+          
+        u16patternTimer=0;
+      }
     
   
 } /* end UserApp1SM_Idle() */
