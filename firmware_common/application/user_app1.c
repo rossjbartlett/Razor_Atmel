@@ -152,10 +152,22 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
+  
+  //Knight Rider Both Ways
+  /*really just looks like the LEDs come in from each end
+   * and stop in the middle and come back tho */
+  
     static u16 u16BlinkCount = 0;
     const u16 u16BlinkRate = 100;
+    
+    //track leds that start on left
     static LedNumberType myLed= 0;//White=1st LED = enum 0
     static LedNumberType prevLed=-1;
+    
+     //track leds that start on right 
+    static LedNumberType myLed2= 7;
+    static LedNumberType prevLed2=-1;
+    
     static bool movingRight=TRUE;
       
     u16BlinkCount++;
@@ -164,27 +176,30 @@ static void UserApp1SM_Idle(void)
       u16BlinkCount = 0;
      
        if (prevLed != -1) LedOff(prevLed);
+       if (prevLed2 != -1) LedOff(prevLed2);
       LedToggle(myLed);
+      LedToggle(myLed2);
       prevLed=myLed;
+      prevLed2=myLed2;
       
       if(movingRight)
       {
         myLed++;
+        myLed2--;
       }
       else 
       {
         myLed--;
+        myLed2++;
       }
     
      //Change Directions when at limits
       if (myLed >= RED) //RED or 7 (last lED)
       {
-        //myLed=RED;
         movingRight=FALSE;
       }
       else if (myLed <=WHITE)
       {
-      //  myLed=WHITE;
         movingRight=TRUE;
       }
     }
