@@ -103,22 +103,17 @@ void UserApp1Initialize(void)
   
   
    /* Initialize all unused LEDs to off */
+  LedOff(WHITE);
+  LedOff(PURPLE);
+  LedOff(BLUE);
   LedOff(CYAN);
   LedOff(GREEN);
   LedOff(YELLOW);
   LedOff(ORANGE);
-  
-  /* Turn on desired LEDs using the ON function */
-  LedOn(BLUE);
-  LedOn(PURPLE);
-
-  /* Set an LED to blink at 2Hz */
-  LedBlink(RED, LED_2HZ);
-
-  /* Set an LED to the dimmest state we have (5% duty cycle) */
-  LedPWM(WHITE, LED_PWM_5);
-  
-  
+  LedOff(RED);
+ 
+  LedOff(LCD_GREEN);
+  LedOff(LCD_BLUE);
   
 } /* end UserApp1Initialize() */
 
@@ -158,14 +153,44 @@ State Machine Function Definitions
 static void UserApp1SM_Idle(void)
 {
     static u16 u16BlinkCount = 0;
-
+    const u16 u16BlinkRate = 100;
+    static LedNumberType myLed= 0;//White=1st LED = enum 0
+    static LedNumberType prevLed=-1;
+    static bool movingRight=TRUE;
+      
     u16BlinkCount++;
-    if(u16BlinkCount == 500)
+    if(u16BlinkCount >= u16BlinkRate)
     {
       u16BlinkCount = 0;
-      LedToggle(PURPLE);
+     
+       if (prevLed != -1) LedOff(prevLed);
+      LedToggle(myLed);
+      prevLed=myLed;
+      
+      if(movingRight)
+      {
+        myLed++;
+      }
+      else 
+      {
+        myLed--;
+      }
+    
+     //Change Directions when at limits
+      if (myLed >= RED) //RED or 7 (last lED)
+      {
+        //myLed=RED;
+        movingRight=FALSE;
+      }
+      else if (myLed <=WHITE)
+      {
+      //  myLed=WHITE;
+        movingRight=TRUE;
+      }
     }
-  
+    
+   
+    
 } /* end UserApp1SM_Idle() */
     
 
