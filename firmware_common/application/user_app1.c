@@ -154,6 +154,7 @@ static void UserApp1SM_Idle(void)
    * 1. Alternate Brightening LED, Dimming LED. GREEN Backlight
   *  2. Half LEDs brightening, Half LEDs dimming. Blue Backlight
   *  3. Knight Rider 
+  *  4. Crossing from both sides 
   */
   
   //Variables for all patterns
@@ -170,18 +171,18 @@ static void UserApp1SM_Idle(void)
       static LedRateType brightness2 = 20;
       static bool goingUp2 = FALSE;
     
-    //Pattern 3 Variables
-       static u16 u16BlinkRate3 = 100;
+    //Pattern 3 and 4 Variables
+      static u16 u16BlinkRate3 = 100;
       static LedNumberType myLed= 0;//White=1st LED = enum 0
       static LedNumberType prevLed=-1;
       static bool movingRight=TRUE;
       static bool firstTimeInPattern3=TRUE;//first time in pattern 3 PER SEQUENCE 
     
-      //Pattern 4 Variables
-        //in addition to pattern 3 vars, track leds that start on right
-        static LedNumberType myLed2= 7;
-        static LedNumberType prevLed2=-1;
-        static bool firstTimeInPattern4=TRUE;//first time in pattern 4 PER SEQUENCE
+    //Pattern 4 Variables
+      //in addition to pattern 3 vars, track leds that start on right
+      static LedNumberType myLed2= 7;
+      static LedNumberType prevLed2=-1;
+      static bool firstTimeInPattern4=TRUE;//first time in pattern 4 PER SEQUENCE
       
     u16BlinkCount++;
     u16patternTimer++;
@@ -190,7 +191,7 @@ static void UserApp1SM_Idle(void)
       
       if(u16patternTimer<=u16patternLength*2)//patterns 1 and 2 
       {
-     
+    
          if(u16BlinkCount >= u16BlinkRate1)//speed of blinking 
         {
           u16BlinkCount = 0;
@@ -353,6 +354,8 @@ static void UserApp1SM_Idle(void)
       else 
       {    //start sequence over
         //reset pattern 4 varibles 
+          myLed= 0;
+          prevLed=-1;
           myLed2= 7;
           prevLed2=-1;
           movingRight=TRUE;
