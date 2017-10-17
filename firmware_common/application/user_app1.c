@@ -177,6 +177,12 @@ static void UserApp1SM_Idle(void)
       static bool movingRight=TRUE;
       static bool firstTimeInPattern3=TRUE;//first time in pattern 3 PER SEQUENCE 
     
+      //Pattern 4 Variables
+        //in addition to pattern 3 vars, track leds that start on right
+        static LedNumberType myLed2= 7;
+        static LedNumberType prevLed2=-1;
+        static bool firstTimeInPattern4=TRUE;//first time in pattern 4 PER SEQUENCE
+      
     u16BlinkCount++;
     u16patternTimer++;
     
@@ -213,10 +219,10 @@ static void UserApp1SM_Idle(void)
           
           if(u16patternTimer< u16patternLength) //pattern1
           {
-            //Green Backlight
-            LedOff(LCD_RED);
-            LedOff(LCD_BLUE);
-            LedOn(LCD_GREEN);
+            //Purple Backlight
+            LedOn(LCD_RED);
+            LedOn(LCD_BLUE);
+            LedOff(LCD_GREEN);
             
             for(LedNumberType ledNum = 0; ledNum<8 ; ledNum++)
             {
@@ -226,9 +232,9 @@ static void UserApp1SM_Idle(void)
           }
           else //pattern 2
           {
-            //BLUE Backlight
+            //cyan Backlight
             LedOff(LCD_RED);
-            LedOff(LCD_GREEN);
+            LedOn(LCD_GREEN);
             LedOn(LCD_BLUE);
             
            for(LedNumberType ledNum = 0; ledNum<8 ; ledNum++)
@@ -285,15 +291,72 @@ static void UserApp1SM_Idle(void)
               movingRight=TRUE;
             }
           }
-      }//end of pattern 3 
+      }//end of pattern 3
       
-      else  //start sequence over
+      else if (u16patternTimer<u16patternLength*4)//4th pattern 
       {
-        //reset pattern 3 varibles so it always starts at left
+         if (firstTimeInPattern4)
+         {
+           //if starting pattern 4, need to turn off all first so that it is clean 
+           for(LedNumberType lednum=0; lednum<8;lednum++)
+           {
+             LedOff(lednum);
+           }
+           firstTimeInPattern4=FALSE;
+          //reset pattern 3 varibles too
           myLed= 0;
           prevLed=-1;
           movingRight=TRUE;
           firstTimeInPattern3=TRUE;
+         }
+         
+         if(u16BlinkCount >= u16BlinkRate3) 
+          {
+            u16BlinkCount = 0;
+            
+           //yellow Backlight
+            LedOn(LCD_GREEN);
+            LedOff(LCD_BLUE);
+            LedOn(LCD_RED);
+            
+            if (prevLed != -1) LedOff(prevLed);
+             if (prevLed2 != -1) LedOff(prevLed2);
+            LedToggle(myLed);
+            LedToggle(myLed2);
+            prevLed=myLed;
+            prevLed2=myLed2;
+            
+            if(movingRight)
+            {
+              myLed++;
+              myLed2--;
+            }
+            else
+            {
+              myLed--;
+              myLed2++;
+            }
+          
+           //Change Directions when at limits
+            if (myLed >= RED) //RED or 7 (last lED)
+            {
+              movingRight=FALSE;
+            }
+            else if (myLed <=WHITE)
+            {
+              movingRight=TRUE;
+            }
+          }
+
+        
+      }//end of pattern 4 
+      else 
+      {    //start sequence over
+        //reset pattern 4 varibles 
+          myLed2= 7;
+          prevLed2=-1;
+          movingRight=TRUE;
+          firstTimeInPattern4=TRUE;
           
         u16patternTimer=0;
       }
