@@ -179,68 +179,31 @@ static void UserApp1SM_Idle(void)
   static u16 stage=1;
   
   u16myCounter++;
-  if (u16myCounter>=1000)
+  if (u16myCounter>=1400)
   {
-   
-    if (stage%2==0)//turn off
+    for(int i = 0 ; i<5 ; i++)//turn OFF LEDS
     {
-      for(int i =0; i<5; i++) 
-      {
-        LedOff(myLed[i]);
-      }
+      LedOff(myLed[i]);
     }
-     stage++;
-    
-    u16myCounter=0;
-    LedPWM(myLed[currentIndex],myPWM[currentIndex]);
-    currentIndex++;
-    if(currentIndex >4)
+     
+    for(int i = 0 ; i<5 ; i++) //move up
     {
-      currentIndex=0;
-    }
-    
-    for(int i =0; i<5; i++) //move the icicle right
-    {
-       //where turn LED off?
-      if (myLed[i] <7)
-      {
-       
-        myLed[i]= myLed[i] +1;
-      }
-      else
-      {
-        myLed[i] = 8;// 'turn off'
-      }
-    }
-    
-    bool stillSearching=TRUE;
-    while (stillSearching)
-    {
-    
-      for(int i =0; i<5; i++) //check if icicle is done falling
-      {
-        if (!icicleDone(myLed[i])) //if true, icicle is done. reset
-        {
-          stillSearching=FALSE;
-          break;
-        }
-        if(i==4) //if gets to this point, reset
-        {
-          //reset
-          for(LedNumberType j=0; j<5;j++)
-          {
-            myLed[j]=j;
-          }
-           stillSearching=FALSE;
-          break;
-        }
-      }
+      myLed[i]++;
     }
     
   }
- 
-  
-  
+
+  else if (u16myCounter>=700)
+  {
+    u16myCounter=0;
+    for(int i = 0 ; i<5 ; i++)//turn on LEDS
+    {
+      LedPWM(myLed[i],myPWM[i]);
+    }
+    
+    
+   // currentIndex++;
+  }
   
   
   //LCD BACKLIGHT CYCLE 
