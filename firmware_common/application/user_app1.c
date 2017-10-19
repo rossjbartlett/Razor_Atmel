@@ -7,7 +7,7 @@ To start a new task using this user_app1 as a template:
  2. Rename the files yournewtaskname.c and yournewtaskname.h
  3. Add yournewtaskname.c and yournewtaskname.h to the Application Include and Source groups in the IAR project
  4. Use ctrl-h (make sure "Match Case" is checked) to find and replace all instances of "user_app1" with "yournewtaskname"
- 5. Use ctrl-h to find and replace all instances of "UserApp1" with "YourNewTaskName"
+ LedAmount. Use ctrl-h to find and replace all instances of "UserApp1" with "YourNewTaskName"
  6. Use ctrl-h to find and replace all instances of "USER_APP1" with "YOUR_NEW_TASK_NAME"
  7. Add a call to YourNewTaskNameInitialize() in the init section of main
  8. Add a call to YourNewTaskNameRunActiveState() in the Super Loop section of main
@@ -172,41 +172,57 @@ static void UserApp1SM_Idle(void)
   static bool bCyclingOn = TRUE;
 
   //vars for icicle
-  static LedNumberType myLed[5] = {0,1,2,3,4}; // 0=leftmost LED
-  static LedRateType myPWM[5] = {20,14,10,6,2}; // correspond to PWM rates 100%,70%,50,30,10
+  static int myLed[LedAmount] = {-4,-3,-2,-1,0}; // 0=leftmost LED
+  //static LedRateType myPWM[LedAmount] = {2,6,10,14,20}; // correspond to PWM rates 10,30,50,70,100 desired in assignment
+  static LedRateType myPWM[LedAmount] = {1,2,5,10,20}; //testing other PWM set
   static u16 u16myCounter = 0;
-  static LedNumberType currentIndex=0;
-  static u16 stage=1;
+  static u16 u16resetCounter=0;
+  static bool firstRun=TRUE;
+  const u16 blinkRate = 60;
   
   u16myCounter++;
-  if (u16myCounter>=1400)
-  {
-    for(int i = 0 ; i<5 ; i++)//turn OFF LEDS
-    {
-      LedOff(myLed[i]);
-    }
-     
-    for(int i = 0 ; i<5 ; i++) //move up
-    {
-      myLed[i]++;
-    }
-    
-  }
-
-  else if (u16myCounter>=700)
+ 
+  if (u16myCounter>=blinkRate)
   {
     u16myCounter=0;
-    for(int i = 0 ; i<5 ; i++)//turn on LEDS
+     for(int i = 0 ; i<LedAmount ; i++)//turn OFF LEDS
     {
-      LedPWM(myLed[i],myPWM[i]);
+      if ( (myLed[i]>=0 && myLed[i]<8) ) 
+         LedOff(myLed[i]);
+    }
+     
+    if (!firstRun)
+    {
+       u16resetCounter++;
+       for(int i = 0 ; i<LedAmount ; i++) //move icicle right
+      {
+        myLed[i]++;
+        if (myLed[i]>7) 
+          myLed[i] = 99; //null value 99
+      }
+    }
+    firstRun=FALSE;
+    
+    for(int i = 0 ; i<LedAmount ; i++)//turn on LEDS
+    {
+      if (myLed[i]>=0 && myLed[i]<8) 
+         LedPWM(myLed[i],myPWM[i]);
     }
     
-    
-   // currentIndex++;
+  }
+  
+  if (u16resetCounter>12) //reset after icicle has passed
+  {
+    u16resetCounter=0;
+     firstRun=TRUE;
+     for(int i = 0 ; i<LedAmount ; i++)
+     {
+       myLed[i] = i-4;
+     }
   }
   
   
-  //LCD BACKLIGHT CYCLE 
+  //LCD BACKLIGHT COLOR CYCLE *****************
   if (bCyclingOn)
   {
   u16Counter--;
