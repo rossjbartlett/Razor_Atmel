@@ -60,6 +60,20 @@ Variable names shall start with "UserApp1_" and be declared as static.
 static fnCode_type UserApp1_StateMachine;            /* The state machine function pointer */
 //static u32 UserApp1_u32Timeout;                      /* Timeout counter used across states */
 
+ #ifdef EIE2 //if board type is EiE2 (not the one im using, could remove)
+  static LedNumberType aeCurrentLed[]  = {GREEN0, RED0, BLUE0, GREEN0, RED0, BLUE0};
+  static LedNumberType aeCurrentLed1[] = {GREEN1, RED1, BLUE1, GREEN1, RED1, BLUE1};
+  static LedNumberType aeCurrentLed2[] = {GREEN2, RED2, BLUE2, GREEN2, RED2, BLUE2};
+  static LedNumberType aeCurrentLed3[] = {GREEN3, RED3, BLUE3, GREEN3, RED3, BLUE3};
+#endif /* EIE2 (changed from MPG2) */
+
+#ifdef EIE1 //this is the board i'm using
+  //the contents of this array reflect the order in which each color is changing
+  //works with the bool array below
+  static LedNumberType aeCurrentLed[]  = {LCD_GREEN, LCD_RED, LCD_BLUE, LCD_GREEN, LCD_RED, LCD_BLUE};
+#endif /* EIE1 (changed from MPG 1) */
+ static bool abLedRateIncreasing[]   = {TRUE,      FALSE,   TRUE,     FALSE,     TRUE,    FALSE}; 
+  
 
 /**********************************************************************************************************************
 Function Definitions
@@ -87,7 +101,11 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
- 
+  /* Start with red LED on 100%, green and blue off */
+  LedPWM(LCD_RED, LED_PWM_100);
+  LedPWM(LCD_GREEN, LED_PWM_0);
+  LedPWM(LCD_BLUE, LED_PWM_0);
+  
   /* If good initialization, set state to Idle */
   if( 1 )
   {
@@ -136,7 +154,69 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
+  //this program smoothly cycles the LCD backlight color
+  // if button0 is pressed, stops cycling and holds color
+  
+  static u8 u8CurrentLedIndex  = 0;
+  static u8 u8LedCurrentLevel  = 0;
+  static u8 u8DutyCycleCounter = 0;
+  static u16 u16Counter = COLOR_CYCLE_TIME;
+  
+  static bool bCyclingOn = TRUE;
 
+  if (bCyclingOn)
+  {
+  u16Counter--;
+  }
+  
+  /* Check for update color every COLOR_CYCLE_TIME ms */  
+  if(u16Counter == 0)
+  {
+    u16Counter = COLOR_CYCLE_TIME;
+
+    /* Update the current level based on which way it's headed */
+    if( abLedRateIncreasing[u8CurrentLedIndex] )
+    {
+      u8LedCurrentLevel++;
+    }
+    else
+    {
+      u8LedCurrentLevel--;
+    }
+
+    /* Change direction once we're at the end */
+    u8DutyCycleCounter++;
+    if(u8DutyCycleCounter == 20)
+    {
+      u8DutyCycleCounter = 0;
+      
+      /* Watch for the indexing variable to reset */
+      u8CurrentLedIndex++;
+      if(u8CurrentLedIndex == sizeof(aeCurrentLed))
+      {
+        u8CurrentLedIndex = 0;
+      }
+      
+      /* Set the current level based on what direction we're now going */
+      u8LedCurrentLevel = 20;
+      if(abLedRateIncreasing[u8CurrentLedIndex])
+      {
+         u8LedCurrentLevel = 0;
+      }
+    }
+    
+    /* Update the value to the current LED */   
+    LedPWM( (LedNumberType)aeCurrentLed[u8CurrentLedIndex], (LedRateType)u8LedCurrentLevel);
+  } 
+  
+     
+   /* Toggle cycling on and off with button */
+  if( WasButtonPressed(BUTTON0) ) // a predefined function 
+  {
+    ButtonAcknowledge(BUTTON0); // a predefined funcion to reset button's flag
+    bCyclingOn = (bool)!bCyclingOn;
+  }
+  
 } /* end UserApp1SM_Idle() */
     
 
