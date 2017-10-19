@@ -144,7 +144,11 @@ void UserApp1RunActiveState(void)
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Private functions                                                                                                  */
 /*--------------------------------------------------------------------------------------------------------------------*/
-
+bool icicleDone(LedNumberType x)
+{
+  if (x==8) return TRUE;
+  else return FALSE;//if LED not at -1
+}
 
 /**********************************************************************************************************************
 State Machine Function Definitions
@@ -154,16 +158,81 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-  //this program smoothly cycles the LCD backlight color
-  // if button0 is pressed, stops cycling and holds color
+  /* LED_Advanced Assignment: 
+  *Recreate the "icicle effect" along the 8 LEDs. 
+  *The leading LED is 100% bright, and the trailing ones 
+  *are 70%, 50%, 30% and 10%.
+  */
   
+  //vars for LCD backlight program
   static u8 u8CurrentLedIndex  = 0;
   static u8 u8LedCurrentLevel  = 0;
   static u8 u8DutyCycleCounter = 0;
   static u16 u16Counter = COLOR_CYCLE_TIME;
-  
   static bool bCyclingOn = TRUE;
 
+  //vars for icicle
+  static LedNumberType myLed[5] = {0,1,2,3,4}; // 0=leftmost LED
+  static LedRateType myPWM[5] = {20,14,10,6,2}; // correspond to PWM rates 100%,70%,50,30,10
+  static u16 u16myCounter = 0;
+  static LedNumberType currentIndex=0;
+  
+  u16myCounter++;
+  if (u16myCounter>=1000)
+  {
+    u16myCounter=0;
+    LedPWM(myLed[currentIndex],myPWM[currentIndex]);
+    currentIndex++;
+    if(currentIndex >4)
+    {
+      currentIndex=0;
+    }
+    
+    for(int i =0; i<5; i++) //move the icicle right
+    {
+       //where turn LED off?
+      if (myLed[i] <7)
+      {
+       
+        myLed[i]= myLed[i] +1;
+      }
+      else
+      {
+        myLed[i] = 8;// 'turn off'
+      }
+    }
+    
+    bool stillSearching=TRUE;
+    while (stillSearching)
+    {
+    
+      for(int i =0; i<5; i++) //check if icicle is done falling
+      {
+        if (!icicleDone(myLed[i])) //if true, icicle is done. reset
+        {
+          stillSearching=FALSE;
+          break;
+        }
+        if(i==4) //if gets to this point, reset
+        {
+          //reset
+          for(LedNumberType j=0; j<5;j++)
+          {
+            myLed[j]=j;
+          }
+           stillSearching=FALSE;
+          break;
+        }
+      }
+    }
+    
+  }
+ 
+  
+  
+  
+  
+  //LCD BACKLIGHT CYCLE 
   if (bCyclingOn)
   {
   u16Counter--;
