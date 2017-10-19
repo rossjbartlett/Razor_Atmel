@@ -176,10 +176,21 @@ static void UserApp1SM_Idle(void)
   static LedRateType myPWM[5] = {20,14,10,6,2}; // correspond to PWM rates 100%,70%,50,30,10
   static u16 u16myCounter = 0;
   static LedNumberType currentIndex=0;
+  static u16 stage=1;
   
   u16myCounter++;
   if (u16myCounter>=1000)
   {
+   
+    if (stage%2==0)//turn off
+    {
+      for(int i =0; i<5; i++) 
+      {
+        LedOff(myLed[i]);
+      }
+    }
+     stage++;
+    
     u16myCounter=0;
     LedPWM(myLed[currentIndex],myPWM[currentIndex]);
     currentIndex++;
