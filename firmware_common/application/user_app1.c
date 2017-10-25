@@ -108,7 +108,10 @@ void UserApp1Initialize(void)
   LedOff(ORANGE);
   LedOff(RED);
   
+  LedOff(LCD_GREEN);
+  LedOff(LCD_BLUE); // LCD is red to start 
   
+ 
 } /* end UserApp1Initialize() */
 
   
@@ -136,7 +139,16 @@ void UserApp1RunActiveState(void)
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Private functions                                                                                                  */
 /*--------------------------------------------------------------------------------------------------------------------*/
+bool check(u32 input[],  u32 password[], u16 passwordLength);
 
+bool check(u32 input[], u32 password[], u16 passwordLength)
+{
+  for (int i = 0; i < passwordLength; i++)
+    {
+      if (input[i] != password[i]) return FALSE;
+    }
+  return TRUE;
+}
 
 /**********************************************************************************************************************
 State Machine Function Definitions
@@ -146,55 +158,70 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-  /* Program: Button1 Toggles Yellow Blink. 
-              Button 2 Increases Blink Rate.
+  /* Program: Password with buttons. 
+              Flash Red LED if entered wrong.
+              Blink Green LED if right.
   */
-  static bool bYellowBlinking=FALSE;
-  static u16 u16BlinkRateSelect=0;
-  const u16 BlinkRateArray[] = {LED_1HZ,LED_2HZ,LED_4HZ,LED_8HZ};
   
-  if (IsButtonPressed(BUTTON0))
-  {
-    LedOn(WHITE);
-  }
-  else
-  {
-    LedOff(WHITE);
-  }
   
-  if (IsButtonPressed(BUTTON2))
+    u32 password[] = {BUTTON0,BUTTON1,BUTTON2,BUTTON1};
+   u16 passwordLength = 4;
+  
+   static u32 input[]={-1,-1,-1,-1};
+  static u16 u16passwordIndex=0;
+  
+  
+  if(WasButtonPressed(BUTTON0))
   {
-    LedOn(BLUE);
-  }
-  else
-  {
-    LedOff(BLUE);
+    ButtonAcknowledge(BUTTON0);
+    input[u16passwordIndex] = BUTTON0;
+    u16passwordIndex++;
   }
   
-  if(WasButtonPressed(BUTTON2)) // up blink rate
-  {
-    ButtonAcknowledge(BUTTON2);
-    if(bYellowBlinking)
-    {
-      u16BlinkRateSelect++;
-      if (u16BlinkRateSelect>3) u16BlinkRateSelect=0;//roll back
-      LedBlink(YELLOW, BlinkRateArray[u16BlinkRateSelect]);//update the rate immediately
-    }
-  }
-  
-  if(WasButtonPressed(BUTTON1))
+   if(WasButtonPressed(BUTTON1))
   {
     ButtonAcknowledge(BUTTON1);
-    if (bYellowBlinking) LedOff(YELLOW);//if currently on, turn it off
-    else LedBlink(YELLOW, BlinkRateArray[u16BlinkRateSelect]);
-    bYellowBlinking=!bYellowBlinking;
+    input[u16passwordIndex] = BUTTON1;
+    u16passwordIndex++;
   }
   
-  /*if( IsButtonHeld(BUTTON2, 2000) ) 
+   if(WasButtonPressed(BUTTON2))
   {
-    LedOn(CYAN);
+    ButtonAcknowledge(BUTTON2);
+    input[u16passwordIndex] = BUTTON2;
+    u16passwordIndex++;
   }
-  else LedOff(CYAN);*/
+  
+  
+  if(u16passwordIndex>10) //if entered >10 buttons reset
+  {
+    LedBlink(RED,LED_2HZ);
+    u16passwordIndex=0;
+    
+  }
+  
+  if(WasButtonPressed(BUTTON3)) // check entry
+  {
+    ButtonAcknowledge(BUTTON3);
+    u16passwordIndex=0;
+
+    if(check(input,password,passwordLength))
+    {
+      LedBlink(GREEN,LED_2HZ); //right
+      LedOff(LCD_RED);
+      LedOff(RED);
+      LedOn(LCD_GREEN);
+    }
+    else // wrong
+    {
+      LedBlink(RED,LED_2HZ);
+      for (int i = 0; i < passwordLength; i++)
+      {
+        input[i]=-1; // clear input array 
+      }
+    }
+      
+  }
   
 } /* end UserApp1SM_Idle() */
     
