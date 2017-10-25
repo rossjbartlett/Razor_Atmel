@@ -99,6 +99,16 @@ void UserApp1Initialize(void)
     UserApp1_StateMachine = UserApp1SM_Error;
   }
 
+  LedOff(WHITE);
+  LedOff(PURPLE);
+  LedOff(BLUE);
+  LedOff(CYAN);
+  LedOff(GREEN);
+  LedOff(YELLOW);
+  LedOff(ORANGE);
+  LedOff(RED);
+  
+  
 } /* end UserApp1Initialize() */
 
   
@@ -136,7 +146,56 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-
+  /* Program: Button1 Toggles Yellow Blink. 
+              Button 2 Increases Blink Rate.
+  */
+  static bool bYellowBlinking=FALSE;
+  static u16 u16BlinkRateSelect=0;
+  const u16 BlinkRateArray[] = {LED_1HZ,LED_2HZ,LED_4HZ,LED_8HZ};
+  
+  if (IsButtonPressed(BUTTON0))
+  {
+    LedOn(WHITE);
+  }
+  else
+  {
+    LedOff(WHITE);
+  }
+  
+  if (IsButtonPressed(BUTTON2))
+  {
+    LedOn(BLUE);
+  }
+  else
+  {
+    LedOff(BLUE);
+  }
+  
+  if(WasButtonPressed(BUTTON2)) // up blink rate
+  {
+    ButtonAcknowledge(BUTTON2);
+    if(bYellowBlinking)
+    {
+      u16BlinkRateSelect++;
+      if (u16BlinkRateSelect>3) u16BlinkRateSelect=0;//roll back
+      LedBlink(YELLOW, BlinkRateArray[u16BlinkRateSelect]);//update the rate immediately
+    }
+  }
+  
+  if(WasButtonPressed(BUTTON1))
+  {
+    ButtonAcknowledge(BUTTON1);
+    if (bYellowBlinking) LedOff(YELLOW);//if currently on, turn it off
+    else LedBlink(YELLOW, BlinkRateArray[u16BlinkRateSelect]);
+    bYellowBlinking=!bYellowBlinking;
+  }
+  
+  /*if( IsButtonHeld(BUTTON2, 2000) ) 
+  {
+    LedOn(CYAN);
+  }
+  else LedOff(CYAN);*/
+  
 } /* end UserApp1SM_Idle() */
     
 
