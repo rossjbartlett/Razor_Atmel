@@ -170,6 +170,8 @@ static void UserApp1SM_Idle(void)
    static u32 input[]={-1,-1,-1,-1};
   static u16 u16passwordIndex=0;
   
+  static bool rightpw=FALSE;
+  static bool wrongpw=FALSE;
   
   if(WasButtonPressed(BUTTON0))
   {
@@ -207,12 +209,12 @@ static void UserApp1SM_Idle(void)
 
     if(check(input,password,passwordLength))
     {
-      LedBlink(GREEN,LED_2HZ); //right
+      LedBlink(GREEN,LED_2HZ); //right password entered
       LedOff(LCD_RED);
       LedOff(RED);
       LedOn(LCD_GREEN);
     }
-    else // wrong
+    else // wrong password entered
     {
       LedBlink(RED,LED_2HZ);
       for (int i = 0; i < passwordLength; i++)
@@ -221,6 +223,20 @@ static void UserApp1SM_Idle(void)
       }
     }
       
+  }
+  
+  
+  
+  //right password entered: blink green for 2sec, then reset
+  if (rightpw)
+  {
+    //for 2 seconds...
+      LedBlink(GREEN,LED_2HZ); //right password entered
+      LedOff(LCD_RED);
+      LedOff(RED);
+      LedOn(LCD_GREEN);
+      
+     //then turn all lights off, reset
   }
   
 } /* end UserApp1SM_Idle() */
