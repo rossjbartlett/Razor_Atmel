@@ -28,7 +28,7 @@ Type Definitions
 /**********************************************************************************************************************
 Constants / Definitions
 **********************************************************************************************************************/
-
+#define MAX_PW_LENGTH 10
 
 /**********************************************************************************************************************
 Function Declarations
@@ -50,11 +50,22 @@ void UserApp1RunActiveState(void);
 /* Private functions                                                                                                  */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+bool check(u32 input[],u16 inputIndex);
+void WasAnyButtonPressed(void);
 
 /***********************************************************************************************************************
 State Machine Declarations
 ***********************************************************************************************************************/
 static void UserApp1SM_Idle(void);    
+
+//user defined for buttons assignment:
+static void UserApp1SM_myIdle(void);    
+static void UserApp1SM_setPW(void);    
+static void UserApp1SM_locked(void);    
+static void UserApp1SM_unlocked(void);    
+static void UserApp1SM_wrongPW(void);    
+
+
 
 static void UserApp1SM_Error(void);         
 

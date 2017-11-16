@@ -60,6 +60,11 @@ Variable names shall start with "UserApp1_" and be declared as static.
 static fnCode_type UserApp1_StateMachine;            /* The state machine function pointer */
 //static u32 UserApp1_u32Timeout;                      /* Timeout counter used across states */
 
+ static u32 password[MAX_PW_LENGTH] = {BUTTON0,BUTTON1,BUTTON2,BUTTON1}; //default PW
+ static u16 passwordLength = 4; //default 
+  
+ static u32 input[MAX_PW_LENGTH]; //input attempted PW 
+
 
 /**********************************************************************************************************************
 Function Definitions
@@ -91,12 +96,13 @@ void UserApp1Initialize(void)
   /* If good initialization, set state to Idle */
   if( 1 )
   {
-    UserApp1_StateMachine = UserApp1SM_Idle;
+    UserApp1_StateMachine = UserApp1SM_myIdle; // changed it to myIdle
   }
   else
   {
     /* The task isn't properly initialized, so shut it down and don't run */
     UserApp1_StateMachine = UserApp1SM_Error;
+    
   }
 
   LedOff(WHITE);
@@ -139,11 +145,11 @@ void UserApp1RunActiveState(void)
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Private functions                                                                                                  */
 /*--------------------------------------------------------------------------------------------------------------------*/
-bool check(u32 input[],  u32 password[], u16 passwordLength,u16* indexpointer);
 
-bool check(u32 input[], u32 password[], u16 passwordLength,u16* indexpointer)
+
+bool check(u32 input[],u16 inputIndex)
 {
-  if (*indexpointer!=passwordLength) return FALSE;
+  if (inputIndex!=passwordLength) return FALSE;
   for (int i = 0; i < passwordLength; i++)
     {
       if (input[i] != password[i]) return FALSE;
@@ -151,135 +157,159 @@ bool check(u32 input[], u32 password[], u16 passwordLength,u16* indexpointer)
   return TRUE;
 }
 
-void reset(u32 input[], u16 passwordLength, u16* indexpointer );
-
-void reset(u32 input[], u16 passwordLength, u16* indexpointer)
+void WasAnyButtonPressed(void)
 {
-   for (int i = 0; i < passwordLength; i++) 
-      {
-        input[i]=-1; // clear input array 
-      }
-   *indexpointer=0;
-   
-    LedOn(LCD_GREEN);
-  LedOn(LCD_BLUE); // LCD is white 
-  LedOn(LCD_RED); 
+  for (u32 i = BUTTON0 ; i<=BUTTON3 ; i++)//check if any of the buttons  pressed
+  {
+    if (WasButtonPressed(i))
+    {
+      ButtonAcknowledge(i);
+      UserApp1_StateMachine = UserApp1SM_locked;
+      LedOn(RED);
+      LedOff(GREEN);
+    }
+  }
 }
+
 
 /**********************************************************************************************************************
 State Machine Function Definitions
 **********************************************************************************************************************/
 
+
+static void UserApp1SM_myIdle(void) //////myIdle state 
+{
+  static u32 u32timer =0;
+  u32timer++;
+  
+  if (IsButtonHeld(BUTTON3,1000)) //enter setPW state
+  {
+    UserApp1_StateMachine = UserApp1SM_setPW;
+    LedBlink(RED,LED_2HZ);
+    LedBlink(GREEN,LED_2HZ);
+  }
+
+
+  else if (u32timer>5000) //enter locked state w/ default PW
+  {
+    UserApp1_StateMachine = UserApp1SM_locked;
+    LedOn(RED);
+  }
+}
+
+
+
+
+static void UserApp1SM_setPW(void)    //////set password  state 
+{
+  u16 u16pwIndex=0;
+  
+  for (u32 i = BUTTON0 ; i<=BUTTON2 ; i++)//check if any of the buttons 0-2 were pressed
+  {
+    if (WasButtonPressed(i))
+    {
+      ButtonAcknowledge(i);
+      if (u16pwIndex<MAX_PW_LENGTH)
+      {
+        password[u16pwIndex]=i;
+        u16pwIndex++;
+        passwordLength=u16pwIndex; //set the PW length to how many buttons u pressed
+      }
+      
+    }
+    
+  }
+  
+  
+  
+  if (WasButtonPressed(BUTTON3))
+  {
+    ButtonAcknowledge(BUTTON3);
+    UserApp1_StateMachine = UserApp1SM_locked;
+    LedOn(RED);
+    LedOff(GREEN);
+  }
+  
+  
+  
+}
+
+
+static void UserApp1SM_locked(void)//locked state
+{
+  static u16 u16inputIndex=0;
+   for (u32 i = BUTTON0 ; i<=BUTTON2 ; i++)//check if any of the buttons 0-2 were pressed
+  {
+    if (WasButtonPressed(i))
+    {
+      ButtonAcknowledge(i);
+      if (u16inputIndex<MAX_PW_LENGTH) 
+      {
+        input[u16inputIndex]=i;
+        u16inputIndex++;
+      }
+      
+    }
+    
+  }
+
+  //should have a check for if you enter >10 buttons 
+  
+  
+  //check answer
+  if (WasButtonPressed(BUTTON3))
+  {
+    ButtonAcknowledge(BUTTON3);
+    if (check(input,u16inputIndex)==TRUE)//pw correct
+    {
+        UserApp1_StateMachine = UserApp1SM_unlocked;
+        LedBlink(GREEN,LED_2HZ);
+        LedOff(RED);
+
+    }
+    else
+    {
+        UserApp1_StateMachine = UserApp1SM_wrongPW;
+        LedBlink(RED,LED_2HZ);
+        LedOff(GREEN);
+    }
+      
+    
+  }
+  
+}
+
+
+
+static void UserApp1SM_unlocked(void)
+{
+  WasAnyButtonPressed();
+}
+
+
+static void UserApp1SM_wrongPW(void)
+{
+   WasAnyButtonPressed();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-  /* Program:  with buttons. 
-              Flash Red LED if entered wrong.
-              Blink Green LED if right.
-  
-  edited nov 15
-  */
-  
-  static u16 blinkTimer = 0;
-  
-  //Set Password
-  u32 password[] = {BUTTON0,BUTTON1,BUTTON2,BUTTON1};
-  u16 passwordLength = 4;
-  
-  static u32 input[]={-1,-1,-1,-1};
-  static u16 u16passwordIndex=0;
-  
-  static bool rightpw=FALSE;
-  static bool wrongpw=FALSE;
-  
-  //input[] is only size 4 right now.. what happens when enter more?
-  if(WasButtonPressed(BUTTON0))
-  {
-    ButtonAcknowledge(BUTTON0);
-    input[u16passwordIndex] = BUTTON0;
-    u16passwordIndex++;
-  }
-  
-   if(WasButtonPressed(BUTTON1)) //i think my button1 is not working
-  {
-    ButtonAcknowledge(BUTTON1);
-    input[u16passwordIndex] = BUTTON1;
-    u16passwordIndex++;
-  }
-  
-   if(WasButtonPressed(BUTTON2))
-  {
-    ButtonAcknowledge(BUTTON2);
-    input[u16passwordIndex] = BUTTON2;
-    u16passwordIndex++;
-  }
-  
-  
-  if(u16passwordIndex>10) //if entered >10 buttons, reset
-  {
-      LedOn(LCD_RED);
-      LedOff(LCD_BLUE);
-      LedOff(LCD_GREEN);
-      LedBlink(RED,LED_2HZ);
-      wrongpw=TRUE;
-    
-  }
-  
-  if(WasButtonPressed(BUTTON3)) // check entry
-  {
-    ButtonAcknowledge(BUTTON3);
-    
-    if(check(input,password,passwordLength,&u16passwordIndex))
-    {
-      LedOff(LCD_RED);
-      //  LedOff(RED);
-      LedOff(LCD_BLUE);
-      LedOn(LCD_GREEN);
-      LedBlink(GREEN,LED_2HZ); 
-      rightpw=TRUE; //right password entered
-    }
-    else // wrong password entered
-    {
-      LedOn(LCD_RED);
-      LedOff(LCD_BLUE);
-      LedOff(LCD_GREEN);
-      LedBlink(RED,LED_2HZ);
-      wrongpw=TRUE;
-    }
-      
-  }
-  
-  
-  
-  //right password entered: blink green for 2sec, then reset
-  if (rightpw)
-  {
-    blinkTimer++;
-   
-    if (blinkTimer>2000) 
-    {
-      blinkTimer=0;
-      rightpw=FALSE;
-      LedOff(GREEN);
-      reset(input, passwordLength, &u16passwordIndex);
-    }
-  }
-  
-  //wrong password entered: blink red for 2sec, then reset
-  if (wrongpw)
-  {
-    blinkTimer++;
-   
-    if (blinkTimer>2000) 
-    {
-      blinkTimer=0;
-      wrongpw=FALSE;
-      LedOff(RED);
-      reset(input, passwordLength, &u16passwordIndex);
-
-    }
-  }
   
 } /* end UserApp1SM_Idle() */
     
