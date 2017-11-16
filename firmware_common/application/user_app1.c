@@ -114,9 +114,10 @@ void UserApp1Initialize(void)
   LedOff(ORANGE);
   LedOff(RED);
   
-  LedOn(LCD_GREEN);
-  LedOn(LCD_BLUE); // LCD is white to start 
-  LedOn(LCD_RED); 
+  // LCD is BLUE to start (in myIdle state)
+  LedOff(LCD_GREEN);
+  LedOn(LCD_BLUE); 
+  LedOff(LCD_RED); 
  
 } /* end UserApp1Initialize() */
 
@@ -167,6 +168,9 @@ void WasAnyButtonPressed(void)
       UserApp1_StateMachine = UserApp1SM_locked;
       LedOn(RED);
       LedOff(GREEN);
+      LedOff(LCD_GREEN);//purp LCD in locked state
+      LedOn(LCD_BLUE); 
+      LedOn(LCD_RED); 
     }
   }
 }
@@ -176,17 +180,21 @@ void WasAnyButtonPressed(void)
 State Machine Function Definitions
 **********************************************************************************************************************/
 
-
-static void UserApp1SM_myIdle(void) //////myIdle state 
+//FINSIHED NOV 15
+static void UserApp1SM_myIdle(void) //////myIdle state (first state upon bootup) 
 {
   static u32 u32timer =0;
   u32timer++;
   
   if (IsButtonHeld(BUTTON3,1000)) //enter setPW state
   {
+    ButtonAcknowledge(BUTTON3);// added
     UserApp1_StateMachine = UserApp1SM_setPW;
     LedBlink(RED,LED_2HZ);
     LedBlink(GREEN,LED_2HZ);
+    LedOn(LCD_GREEN); //yellow LCD in setPW state
+    LedOff(LCD_BLUE); 
+    LedOn(LCD_RED); 
   }
 
 
@@ -194,6 +202,9 @@ static void UserApp1SM_myIdle(void) //////myIdle state
   {
     UserApp1_StateMachine = UserApp1SM_locked;
     LedOn(RED);
+    LedOff(LCD_GREEN); //purp LCD in locked state
+    LedOn(LCD_BLUE); 
+    LedOn(LCD_RED); 
   }
 }
 
@@ -202,7 +213,7 @@ static void UserApp1SM_myIdle(void) //////myIdle state
 
 static void UserApp1SM_setPW(void)    //////set password  state 
 {
-  u16 u16pwIndex=0;
+  static u16 u16pwIndex=0;
   
   for (u32 i = BUTTON0 ; i<=BUTTON2 ; i++)//check if any of the buttons 0-2 were pressed
   {
@@ -219,15 +230,18 @@ static void UserApp1SM_setPW(void)    //////set password  state
     }
     
   }
+  /* if you entered a PW of size > max, only the digits up to MAX are saved as the PW*/
+  //or could make you try again ( go to 'wrong' state?)
   
-  
-  
-  if (WasButtonPressed(BUTTON3))
+  if (WasButtonPressed(BUTTON3)) //this block is entered immediately upon entering the state
   {
     ButtonAcknowledge(BUTTON3);
     UserApp1_StateMachine = UserApp1SM_locked;
     LedOn(RED);
     LedOff(GREEN);
+    LedOff(LCD_GREEN);//purple LCD in locked state
+    LedOn(LCD_BLUE); 
+    LedOn(LCD_RED); 
   }
   
   
@@ -246,15 +260,17 @@ static void UserApp1SM_locked(void)//locked state
       if (u16inputIndex<MAX_PW_LENGTH) 
       {
         input[u16inputIndex]=i;
-        u16inputIndex++;
       }
-      
+       u16inputIndex++;//moved this out of the above if block
+      //otherwise, if PWsize is MAX, and you enter >MAX inputs but with the
+      //combination up to MAX being correct, it would think you're correct
     }
     
   }
 
-  //should have a check for if you enter >10 buttons 
-  
+  /*dont need a check for if you enter >10 buttons b/c 
+    input[] is only updated if it's < max pw length
+  */
   
   //check answer
   if (WasButtonPressed(BUTTON3))
@@ -265,6 +281,9 @@ static void UserApp1SM_locked(void)//locked state
         UserApp1_StateMachine = UserApp1SM_unlocked;
         LedBlink(GREEN,LED_2HZ);
         LedOff(RED);
+        LedOn(LCD_GREEN);//green LCD in unlocked state
+        LedOff(LCD_BLUE); 
+        LedOff(LCD_RED); 
 
     }
     else
@@ -272,9 +291,13 @@ static void UserApp1SM_locked(void)//locked state
         UserApp1_StateMachine = UserApp1SM_wrongPW;
         LedBlink(RED,LED_2HZ);
         LedOff(GREEN);
+        LedOff(LCD_GREEN);//red LCD in wrong state
+        LedOff(LCD_BLUE); 
+        LedOn(LCD_RED); 
     }
       
-    
+    u16inputIndex=0;//basically resets input. 
+    //dont need to actually clear the array bc if inputindex!=pwLength, fail 
   }
   
 }
