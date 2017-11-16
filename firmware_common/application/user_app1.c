@@ -177,6 +177,8 @@ static void UserApp1SM_Idle(void)
   /* Program:  with buttons. 
               Flash Red LED if entered wrong.
               Blink Green LED if right.
+  
+  edited nov 15
   */
   
   static u16 blinkTimer = 0;
