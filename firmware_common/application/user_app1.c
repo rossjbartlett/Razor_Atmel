@@ -108,9 +108,9 @@ void UserApp1Initialize(void)
   LedOff(ORANGE);
   LedOff(RED);
   
-  LedOff(LCD_GREEN);
-  LedOff(LCD_BLUE); // LCD is red to start 
-  
+  LedOn(LCD_GREEN);
+  LedOn(LCD_BLUE); // LCD is white to start 
+  LedOn(LCD_RED); 
  
 } /* end UserApp1Initialize() */
 
@@ -139,15 +139,31 @@ void UserApp1RunActiveState(void)
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Private functions                                                                                                  */
 /*--------------------------------------------------------------------------------------------------------------------*/
-bool check(u32 input[],  u32 password[], u16 passwordLength);
+bool check(u32 input[],  u32 password[], u16 passwordLength,u16* indexpointer);
 
-bool check(u32 input[], u32 password[], u16 passwordLength)
+bool check(u32 input[], u32 password[], u16 passwordLength,u16* indexpointer)
 {
+  if (*indexpointer!=passwordLength) return FALSE;
   for (int i = 0; i < passwordLength; i++)
     {
       if (input[i] != password[i]) return FALSE;
     }
   return TRUE;
+}
+
+void reset(u32 input[], u16 passwordLength, u16* indexpointer );
+
+void reset(u32 input[], u16 passwordLength, u16* indexpointer)
+{
+   for (int i = 0; i < passwordLength; i++) 
+      {
+        input[i]=-1; // clear input array 
+      }
+   *indexpointer=0;
+   
+    LedOn(LCD_GREEN);
+  LedOn(LCD_BLUE); // LCD is white 
+  LedOn(LCD_RED); 
 }
 
 /**********************************************************************************************************************
@@ -158,21 +174,24 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-  /* Program: Password with buttons. 
+  /* Program:  with buttons. 
               Flash Red LED if entered wrong.
               Blink Green LED if right.
   */
   
+  static u16 blinkTimer = 0;
   
-    u32 password[] = {BUTTON0,BUTTON1,BUTTON2,BUTTON1};
-   u16 passwordLength = 4;
+  //Set Password
+  u32 password[] = {BUTTON0,BUTTON1,BUTTON2,BUTTON1};
+  u16 passwordLength = 4;
   
-   static u32 input[]={-1,-1,-1,-1};
+  static u32 input[]={-1,-1,-1,-1};
   static u16 u16passwordIndex=0;
   
   static bool rightpw=FALSE;
   static bool wrongpw=FALSE;
   
+  //input[] is only size 4 right now.. what happens when enter more?
   if(WasButtonPressed(BUTTON0))
   {
     ButtonAcknowledge(BUTTON0);
@@ -180,7 +199,7 @@ static void UserApp1SM_Idle(void)
     u16passwordIndex++;
   }
   
-   if(WasButtonPressed(BUTTON1))
+   if(WasButtonPressed(BUTTON1)) //i think my button1 is not working
   {
     ButtonAcknowledge(BUTTON1);
     input[u16passwordIndex] = BUTTON1;
@@ -195,32 +214,36 @@ static void UserApp1SM_Idle(void)
   }
   
   
-  if(u16passwordIndex>10) //if entered >10 buttons reset
+  if(u16passwordIndex>10) //if entered >10 buttons, reset
   {
-    LedBlink(RED,LED_2HZ);
-    u16passwordIndex=0;
+      LedOn(LCD_RED);
+      LedOff(LCD_BLUE);
+      LedOff(LCD_GREEN);
+      LedBlink(RED,LED_2HZ);
+      wrongpw=TRUE;
     
   }
   
   if(WasButtonPressed(BUTTON3)) // check entry
   {
     ButtonAcknowledge(BUTTON3);
-    u16passwordIndex=0;
-
-    if(check(input,password,passwordLength))
+    
+    if(check(input,password,passwordLength,&u16passwordIndex))
     {
-      LedBlink(GREEN,LED_2HZ); //right password entered
       LedOff(LCD_RED);
-      LedOff(RED);
+      //  LedOff(RED);
+      LedOff(LCD_BLUE);
       LedOn(LCD_GREEN);
+      LedBlink(GREEN,LED_2HZ); 
+      rightpw=TRUE; //right password entered
     }
     else // wrong password entered
     {
+      LedOn(LCD_RED);
+      LedOff(LCD_BLUE);
+      LedOff(LCD_GREEN);
       LedBlink(RED,LED_2HZ);
-      for (int i = 0; i < passwordLength; i++)
-      {
-        input[i]=-1; // clear input array 
-      }
+      wrongpw=TRUE;
     }
       
   }
@@ -230,13 +253,30 @@ static void UserApp1SM_Idle(void)
   //right password entered: blink green for 2sec, then reset
   if (rightpw)
   {
-    //for 2 seconds...
-      LedBlink(GREEN,LED_2HZ); //right password entered
-      LedOff(LCD_RED);
+    blinkTimer++;
+   
+    if (blinkTimer>2000) 
+    {
+      blinkTimer=0;
+      rightpw=FALSE;
+      LedOff(GREEN);
+      reset(input, passwordLength, &u16passwordIndex);
+    }
+  }
+  
+  //wrong password entered: blink red for 2sec, then reset
+  if (wrongpw)
+  {
+    blinkTimer++;
+   
+    if (blinkTimer>2000) 
+    {
+      blinkTimer=0;
+      wrongpw=FALSE;
       LedOff(RED);
-      LedOn(LCD_GREEN);
-      
-     //then turn all lights off, reset
+      reset(input, passwordLength, &u16passwordIndex);
+
+    }
   }
   
 } /* end UserApp1SM_Idle() */
