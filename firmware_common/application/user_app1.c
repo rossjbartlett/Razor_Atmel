@@ -157,8 +157,8 @@ static void UserApp1SM_Idle(void)
     ButtonAcknowledge(BUTTON0);
     
     DebugPrintf(u8NumCharsMessage);
-    DebugPrintNumber(G_u8DebugScanfCharCount);
-    DebugLineFeed();
+    DebugPrintNumber(G_u8DebugScanfCharCount); //prints num of chars in the input buffer stream
+    DebugLineFeed(); // carriage return and new line 
   }
   
   //when press button1, read buffer into array, and print it back
@@ -167,10 +167,10 @@ static void UserApp1SM_Idle(void)
     ButtonAcknowledge(BUTTON1);
     
     /* Read the buffer and print the contents */
-    u8CharCount = DebugScanf(UserApp_au8UserInputBuffer);
+    u8CharCount = DebugScanf(UserApp_au8UserInputBuffer);//reads the buffer into the array AND returns num of chars read
     UserApp_au8UserInputBuffer[u8CharCount] = '\0';
-    DebugPrintf(au8BufferMessage);
-    
+  
+    DebugPrintf(au8BufferMessage);    
     /* Make sure there's at least one character in there! */
     if(u8CharCount > 0)
     {
@@ -180,7 +180,7 @@ static void UserApp1SM_Idle(void)
     else
     {
      // DebugPrintf(au8EmptyMessage);
-      DebugPrintf("buffer is empty\n"); //can pass a string literal into DebugPrintf
+      DebugPrintf("buffer is empty\n"); //can pass the 'empty message' array, or just pass a string literal into DebugPrintf
     }
   }
   
