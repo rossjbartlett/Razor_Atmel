@@ -144,13 +144,54 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-
+  /* Program: detect name on input buffer
+  * count how many times it's typed by monitoring the unput buffer 
+  *
+  *
+  */
    static u8 u8NumCharsMessage[] = "\n\rCharacters in buffer: ";
    static u8 au8BufferMessage[]   = "\n\rBuffer contents:\n\r";
   u8 au8EmptyMessage[] = "EMPTY!\n";
    u8 u8CharCount;
+   
   
-  
+  static u16 detectCount=0;
+  for(u16 i = 0; i < U16_USER_INPUT_BUFFER_SIZE  ; i++)
+  {
+    if (G_au8DebugScanfBuffer[i] == 'r' || G_au8DebugScanfBuffer[i] == 'R')
+    {
+       if (G_au8DebugScanfBuffer[i+1] == 'o' && G_au8DebugScanfBuffer[i+2] == 's' && G_au8DebugScanfBuffer[i+3] == 's')
+       {
+         detectCount++;
+         //clear the buffer so it doesnt count it every superloop
+         for(u16 i = 0; i < DEBUG_SCANF_BUFFER_SIZE  ; i++)
+          {
+            G_au8DebugScanfBuffer[i] = 0;
+          }
+         
+         //print count surrounded by box of stars '*'
+         DebugLineFeed();
+         DebugPrintf("*****\n\r");
+         DebugPrintf("* ");
+         DebugPrintNumber(detectCount);
+         DebugPrintf(" *\n\r");
+         DebugPrintf("*****\n\r");
+         //Need to make box changes size when number is higher 
+       }
+    }
+  }
+   
+   
+   /* this works perfectly. Or, could have an array targetName[] and say 
+  * If the buffer == targetName 
+  *
+  */
+   
+   
+   
+   
+   /* Button commands from Debug Module ****************************  */
+   
   /* When press button0, Print message with number of characters in scanf buffer */
   if(WasButtonPressed(BUTTON0))
   {
@@ -168,6 +209,7 @@ static void UserApp1SM_Idle(void)
     
     /* Read the buffer and print the contents */
     u8CharCount = DebugScanf(UserApp_au8UserInputBuffer);//reads the buffer into the array AND returns num of chars read
+    //DebugScanf also clears the buffer
     UserApp_au8UserInputBuffer[u8CharCount] = '\0';
   
     DebugPrintf(au8BufferMessage);    
