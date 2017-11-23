@@ -135,6 +135,35 @@ void UserApp1RunActiveState(void)
 /* Private functions                                                                                                  */
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+void printcount(u16 count);
+
+void printcount(u16 count){
+  
+  //count num of digits in count 
+   u16 numOfDigits = 0;
+  const u16 detectCount=count;
+  while (count>0){
+    count/=10;
+    numOfDigits++;
+  }
+  
+  //print box
+  DebugLineFeed(); // new line & carriage return 
+  for (int i = 0 ; i<numOfDigits+2 ; i++) //print at least 2 stars
+  {
+    DebugPrintf("*");
+  }
+  DebugLineFeed();
+  DebugPrintf("*");
+  DebugPrintNumber(detectCount);
+  DebugPrintf("*\n\r");
+  for (int i = 0 ; i<numOfDigits+2 ; i++)
+  {
+    DebugPrintf("*");
+  }
+  DebugLineFeed();
+  
+}
 
 /**********************************************************************************************************************
 State Machine Function Definitions
@@ -163,20 +192,15 @@ static void UserApp1SM_Idle(void)
        if (G_au8DebugScanfBuffer[i+1] == 'o' && G_au8DebugScanfBuffer[i+2] == 's' && G_au8DebugScanfBuffer[i+3] == 's')
        {
          detectCount++;
+        
          //clear the buffer so it doesnt count it every superloop
          for(u16 i = 0; i < DEBUG_SCANF_BUFFER_SIZE  ; i++)
           {
             G_au8DebugScanfBuffer[i] = 0;
           }
          
-         //print count surrounded by box of stars '*'
-         DebugLineFeed();
-         DebugPrintf("*****\n\r");
-         DebugPrintf("* ");
-         DebugPrintNumber(detectCount);
-         DebugPrintf(" *\n\r");
-         DebugPrintf("*****\n\r");
-         //Need to make box changes size when number is higher 
+         //print 
+         printcount(detectCount);
        }
     }
   }
@@ -185,6 +209,7 @@ static void UserApp1SM_Idle(void)
    /* this works perfectly. Or, could have an array targetName[] and say 
   * If the buffer == targetName 
   *
+
   */
    
    
