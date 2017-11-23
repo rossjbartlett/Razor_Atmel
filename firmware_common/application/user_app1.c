@@ -99,6 +99,10 @@ void UserApp1Initialize(void)
     UserApp1_StateMachine = UserApp1SM_Error;
   }
 
+  
+   PWMAudioSetFrequency(BUZZER1, 500);
+  
+  
 } /* end UserApp1Initialize() */
 
   
@@ -136,7 +140,44 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-
+  
+  if(WasButtonPressed(BUTTON0)) //set the freq for button 0 
+  {
+    ButtonAcknowledge(BUTTON0);
+    PWMAudioSetFrequency(BUZZER1, 262);
+  }
+  
+  if(WasButtonPressed(BUTTON1)) //set the freq for button 1
+  {
+    ButtonAcknowledge(BUTTON1);
+    PWMAudioSetFrequency(BUZZER1, 294);
+  }
+  
+  if(WasButtonPressed(BUTTON2)) //set the freq for button 2 
+  {
+    ButtonAcknowledge(BUTTON2);
+    PWMAudioSetFrequency(BUZZER1, 330);
+  }
+  
+  if(WasButtonPressed(BUTTON3)) //set the freq for button 3 
+  {
+    ButtonAcknowledge(BUTTON3);
+    PWMAudioSetFrequency(BUZZER1, 392);
+  }
+  
+  
+  /* Tone is on as long as button is pressed */
+  if( IsButtonPressed(BUTTON0) || IsButtonPressed(BUTTON1) ||
+      IsButtonPressed(BUTTON2) || IsButtonPressed(BUTTON3) )
+  {
+    PWMAudioOn(BUZZER1);
+  }
+  else
+  {
+    PWMAudioOff(BUZZER1);    
+  }
+  
+  
 } /* end UserApp1SM_Idle() */
     
 
