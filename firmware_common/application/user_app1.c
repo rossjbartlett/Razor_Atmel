@@ -146,20 +146,20 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-  
+  /* my song program */
   
   
   //right hand
-   static u16 au16NotesRight[]    = {F5, F5, F5, F5, F5, E5, D5, E5, F5, G5, A5, A5, A5, A5, A5, G5, F5, G5, A5, A5S, C6, F5, F5, D6, C6, A5S, A5, G5, F5, NO, NO}; 
-  static u16 au16DurationRight[] = {QN, QN, HN, EN, EN, EN, EN, EN, EN, QN, QN, QN, HN, EN, EN, EN, EN, EN, EN, QN,  HN, HN, EN, EN, EN, EN,  QN, QN, HN, HN, FN};
-  static u16 au16NoteTypeRight[] = {RT, RT, HT, RT, RT, RT, RT, RT, RT, RT, RT, RT, HT, RT, RT, RT, RT, RT, RT, RT,  RT, HT, RT, RT, RT, RT,  RT, RT, RT, HT, HT};
+   static u16 au16NotesRight[]    = {G3, C3, D3S, F3, G3, C3, D3S, F3,G3, C3, D3S, F3,G3, C3, D3S, F3}; 
+  static u16 au16DurationRight[] = {QN, QN,   EN, EN, QN, QN, EN,  EN,QN, QN, EN, EN, QN, QN, EN, EN};
+  static u16 au16NoteTypeRight[] = {RT, RT,    RT, RT,RT, RT,  RT, RT,RT, RT,  RT, RT,RT, RT,  RT, RT};
    static u8 u8IndexRight = 0;
   static u32 u32RightTimer = 0;
   static u16 u16CurrentDurationRight = 0;
   static u16 u16NoteSilentDurationRight = 0;
   static bool bNoteActiveNextRight = TRUE;
 //left hand
-   static u16 au16NotesLeft[]    = {F4, F4, A4, A4, D4, D4, F4, F4, A3S, A3S, D4, D4, C4, C4, E4, E4};
+  /* static u16 au16NotesLeft[]    = {F4, F4, A4, A4, D4, D4, F4, F4, A3S, A3S, D4, D4, C4, C4, E4, E4};
   static u16 au16DurationLeft[] = {EN, EN, EN, EN, EN, EN, EN, EN, EN,  EN,  EN, EN, EN, EN, EN, EN};
   static u16 au16NoteTypeLeft[] = {RT, RT, RT, RT, RT, RT, RT, RT, RT,  RT,  RT, RT, RT, RT, RT, RT};
   static u8 u8IndexLeft = 0;
@@ -167,7 +167,7 @@ static void UserApp1SM_Idle(void)
   static u16 u16CurrentDurationLeft = 0;
   static u16 u16NoteSilentDurationLeft = 0;
   static bool bNoteActiveNextLeft = TRUE;
-  
+  */
   u8 u8CurrentIndex;
   
   
@@ -292,7 +292,7 @@ static void UserApp1SM_Idle(void)
   
   
   
-  
+#if 0
   /* Left Hand */
   if(IsTimeUp(&u32LeftTimer, (u32)u16CurrentDurationLeft))
   {
@@ -354,7 +354,7 @@ static void UserApp1SM_Idle(void)
       }
     } /* end else if(bNoteActiveNextLeft) */
   } /* end if(IsTimeUp(&u32LeftTimer, (u32)u16CurrentDurationLeft)) */
-  
+#endif
   
 } /* end UserApp1SM_Idle() */
     
