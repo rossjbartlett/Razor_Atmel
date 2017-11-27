@@ -150,25 +150,23 @@ static void UserApp1SM_Idle(void)
   /* my song program 
    *GOT
   *USING "FN" full notes made errors because song is in 3/4. instead just make 3 quarter notes.
-  *first loop of the song works. after that it seems to play differenly
-  *need to edit LEDS too
   */
   
   
   //right hand
-   static u16 au16NotesRight[]    = {G5, C5, D5S, F5, G5, C5, D5S, F5,G5, C5, D5S, F5,G5, C5, D5S, F5,D5,D5,D5,D5,D5,D5,D5,D5,D5,D5,D5,D5,F5,F5,F5,A5S,A5S,A5S,F5,F5,F5,A5S,A5S,A5S,D5S,D5,G6, C6, D6S, F6, G6, C6, D6S, F6,G6, C6, D6S, F6,G6, C6, D6S, F6}; 
-  static u16 au16DurationRight[] = {QN, QN,   EN, EN, QN, QN, EN,  EN,QN, QN, EN, EN, QN, QN, EN, EN, QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN, QN, QN, QN,QN,QN,QN,  QN,QN, EN , EN,QN, QN, EN,  EN,  QN,QN, EN,  EN, QN,QN, EN,  EN, QN,QN, EN,  EN};
-  static u16 au16NoteTypeRight[] = {RT, RT,   RT, RT, RT, RT,  RT, RT,RT, RT, RT, RT, RT, RT, RT, RT, HT,HT,HT,HT,HT,HT,HT,HT,HT,HT,HT,HT,HT,HT,HT,HT, HT, HT, HT,HT,HT,HT,  HT,HT, RT, RT, RT, RT,  RT,  RT, RT, RT, RT, RT, RT, RT, RT, RT, RT, RT, RT, RT};
+  const static u16 au16NotesRight[]    = {G5, C5, D5S, F5, G5, C5, D5S, F5,G5, C5, D5S, F5,G5, C5, D5S, F5,D5,D5,D5,D5,D5,D5,D5,D5,D5,D5,D5,D5,F5,F5,F5,A5S,A5S,A5S,F5,F5,F5,A5S,A5S,A5S,D5S,D5,G6, C6, D6S, F6, G6, C6, D6S, F6,G6, C6, D6S, F6,G6, C6, D6S, F6}; 
+  const static u16 au16DurationRight[] = {QN, QN,   EN, EN, QN, QN, EN,  EN,QN, QN, EN, EN, QN, QN, EN, EN, QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN, QN, QN, QN,QN,QN,QN,  QN,QN, EN , EN,QN, QN, EN,  EN,  QN,QN, EN,  EN, QN,QN, EN,  EN, QN,QN, EN,  EN};
+  const static u16 au16NoteTypeRight[] = {RT, RT,   RT, RT, RT, RT,  RT, RT,RT, RT, RT, RT, RT, RT, RT, RT, HT,HT,HT,HT,HT,HT,HT,HT,HT,HT,HT,HT,HT,HT,HT,HT, HT, HT, HT,HT,HT,HT,  HT,HT, RT, RT, RT, RT,  RT,  RT, RT, RT, RT, RT, RT, RT, RT, RT, RT, RT, RT, RT};
    static u8 u8IndexRight = 0;
   static u32 u32RightTimer = 0;
   static u16 u16CurrentDurationRight = 0;
   static u16 u16NoteSilentDurationRight = 0;
   static bool bNoteActiveNextRight = TRUE;
 //left hand
-   static u16 au16NotesLeft[]    = {G4,G4,G4,C4,C4,C4,G4,G4,G4,C4,C4,C4,D4, G3, A3S, C4,D4, G3, A3S, C4,D4, G3, A3S, C4,D4, G3, A3S, C4,F4,F4,F4,A3S,A3S,D4,D4S,F4,F4,F4,A3S,A3S,A3S,D4S,D4,C4,C4,C4,C4,C4,C4,C4,C4,C4,C4,C4,C4};
-   static u16 au16DurationLeft[] = {QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN ,QN, EN,  EN,QN ,QN, EN,  EN,QN ,QN, EN,  EN,QN ,QN, EN, EN, QN,QN,QN, QN,QN,  EN,EN,QN,QN,QN,QN, QN, QN, EN,EN,QN, QN, QN,QN,QN,QN,QN,QN,QN,QN,QN,QN};    
-  static u16 au16NoteTypeLeft[] = {HT,HT,HT, HT,HT,HT,HT,HT,HT,HT,HT,HT,RT, RT, RT,  RT,RT, RT, RT,  RT, RT, RT, RT, RT,RT, RT, RT, RT, HT,HT,HT, HT,RT, RT,RT, HT,HT,HT, HT,HT,HT,  RT,RT,HN, HN, HN,HN,HN,HN,HN,HN,HN,HN,HN,HN};
-  static u8 u8IndexLeft = 0;
+  const static u16 au16NotesLeft[]    = {G4,G4,G4,C4,C4,C4,G4,G4,G4,C4,C4,C4,D4, G3, A3S, C4,D4, G3, A3S, C4,D4, G3, A3S, C4,D4, G3, A3S, C4,F4,F4,F4,A3S,A3S,D4,D4S,F4,F4,F4,A3S,A3S,A3S,D4S,D4,C4,C4,C4,C4,C4,C4,C4,C4,C4,C4,C4,C4};
+  const static u16 au16DurationLeft[] = {QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN ,QN, EN,  EN,QN ,QN, EN,  EN,QN ,QN, EN,  EN,QN ,QN, EN, EN, QN,QN,QN, QN,QN,  EN,EN,QN,QN,QN,QN, QN, QN, EN,EN,QN, QN, QN,QN,QN,QN,QN,QN,QN,QN,QN,QN};    
+ const  static u16 au16NoteTypeLeft[] = {HT,HT,HT, HT,HT,HT,HT,HT,HT,HT,HT,HT,RT, RT, RT,  RT,RT, RT, RT,  RT, RT, RT, RT, RT,RT, RT, RT, RT, HT,HT,HT, HT,RT, RT,RT, HT,HT,HT, HT,HT,HT,  RT,RT,HT, HT, HT,HT,HT,HT,HT,HT,HT,HT,HT,HT};
+  static u16 u8IndexLeft = 0; //made this u16 instead of u8
   static u32 u32LeftTimer = 0;
   static u16 u16CurrentDurationLeft = 0;
   static u16 u16NoteSilentDurationLeft = 0;
@@ -184,7 +182,7 @@ static void UserApp1SM_Idle(void)
     u8CurrentIndex = u8IndexRight;
     if (u8CurrentIndex ==0) 
     {
-      u8CurrentIndex==0;
+      DebugPrintf("starting RIGHT");
     }
     /* Set up to play current note */
     if(bNoteActiveNextRight)
@@ -224,39 +222,27 @@ static void UserApp1SM_Idle(void)
         /* LED control */
         switch(au16NotesRight[u8CurrentIndex])
         {
-          case C5:
-            LedOn(WHITE);
-            break;
-            
-          case D5S:
-            LedOn(PURPLE);
-            break;
-            
-          case F5:
-            LedOn(BLUE);
-            break;
-            
-          case G5:
-            LedOn(CYAN);
-            break;
-            
-          case C6:
+        case C6:
+        case C5:
             LedOn(GREEN);
             break;
             
-          case D6S:
+        case D6S:
+        case D5S:
             LedOn(YELLOW);
             break;
             
-          case F6:
+        case F6:
+        case F5:
             LedOn(ORANGE);
             break;
             
-          case G6:
+        case G6:
+        case G5:
             LedOn(RED);
             break;
             
-          default:
+        default:
             break;
             
         } /* end switch */
@@ -264,10 +250,7 @@ static void UserApp1SM_Idle(void)
       else
       {                
         PWMAudioOff(BUZZER1);
-        LedOff(WHITE);
-        LedOff(PURPLE);
-        LedOff(BLUE);
-        LedOff(CYAN);
+       
         LedOff(GREEN);
         LedOff(YELLOW);
         LedOff(ORANGE);
@@ -282,10 +265,7 @@ static void UserApp1SM_Idle(void)
       u16CurrentDurationRight = u16NoteSilentDurationRight;
       bNoteActiveNextRight = TRUE;
  
-       LedOff(WHITE);
-      LedOff(PURPLE);
-      LedOff(BLUE);
-      LedOff(CYAN);
+     
       LedOff(GREEN);
       LedOff(YELLOW);
       LedOff(ORANGE);
@@ -309,7 +289,7 @@ static void UserApp1SM_Idle(void)
     u8CurrentIndex = u8IndexLeft;
       if (u8CurrentIndex ==0) 
     {
-      u8CurrentIndex==0;
+      DebugPrintf("starting LEFT");
     }
     /* Set up to play current note */
     if(bNoteActiveNextLeft)
@@ -335,6 +315,10 @@ static void UserApp1SM_Idle(void)
         bNoteActiveNextLeft = TRUE;
 
         u8IndexLeft++;
+        if( u8IndexLeft>40)
+        {
+          u8IndexLeft=u8IndexLeft;
+        }
         if(u8IndexLeft == sizeof(au16NotesLeft) / sizeof(u16) )
         {
           u8IndexLeft = 0;
@@ -346,10 +330,38 @@ static void UserApp1SM_Idle(void)
       {
         PWMAudioSetFrequency(BUZZER2, au16NotesLeft[u8CurrentIndex]);
         PWMAudioOn(BUZZER2);
+         /* LED control */
+        switch(au16NotesLeft[u8CurrentIndex])
+        {
+          case G3:
+            LedOn(WHITE);
+            break;
+            
+          case A3S:
+            LedOn(PURPLE);
+            break;
+            
+          case C4:
+            LedOn(BLUE);
+            break;
+            
+          case D4:
+            LedOn(CYAN);
+            break;
+            
+          default:
+            break;
+            
+        } /* end switch */
       }
       else
       {                
         PWMAudioOff(BUZZER2);
+      LedOff(WHITE);
+      LedOff(PURPLE);
+      LedOff(BLUE);
+      LedOff(CYAN);
+      
       }
     }
     else
@@ -359,7 +371,16 @@ static void UserApp1SM_Idle(void)
       u16CurrentDurationLeft = u16NoteSilentDurationLeft;
       bNoteActiveNextLeft = TRUE;
       
+      LedOff(WHITE);
+      LedOff(PURPLE);
+      LedOff(BLUE);
+      LedOff(CYAN);
+      
       u8IndexLeft++;
+      if( u8IndexLeft>40)
+      {
+        u8IndexLeft=u8IndexLeft;
+      }
       if(u8IndexLeft == sizeof(au16NotesLeft) / sizeof(u16) )
       {
         u8IndexLeft = 0;
