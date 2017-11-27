@@ -166,7 +166,7 @@ static void UserApp1SM_Idle(void)
   const static u16 au16NotesLeft[]    = {G4,G4,G4,C4,C4,C4,G4,G4,G4,C4,C4,C4,D4, G3, A3S, C4,D4, G3, A3S, C4,D4, G3, A3S, C4,D4, G3, A3S, C4,F4,F4,F4,A3S,A3S,D4,D4S,F4,F4,F4,A3S,A3S,A3S,D4S,D4,C4,C4,C4,C4,C4,C4,C4,C4,C4,C4,C4,C4};
   const static u16 au16DurationLeft[] = {QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN ,QN, EN,  EN,QN ,QN, EN,  EN,QN ,QN, EN,  EN,QN ,QN, EN, EN, QN,QN,QN, QN,QN,  EN,EN,QN,QN,QN,QN, QN, QN, EN,EN,QN, QN, QN,QN,QN,QN,QN,QN,QN,QN,QN,QN};    
  const  static u16 au16NoteTypeLeft[] = {HT,HT,HT, HT,HT,HT,HT,HT,HT,HT,HT,HT,RT, RT, RT,  RT,RT, RT, RT,  RT, RT, RT, RT, RT,RT, RT, RT, RT, HT,HT,HT, HT,RT, RT,RT, HT,HT,HT, HT,HT,HT,  RT,RT,HT, HT, HT,HT,HT,HT,HT,HT,HT,HT,HT,HT};
-  static u16 u8IndexLeft = 0; //made this u16 instead of u8
+  static u16 u8IndexLeft = 0; //made this u16 instead of u8. shouldnt matter tho
   static u32 u32LeftTimer = 0;
   static u16 u16CurrentDurationLeft = 0;
   static u16 u16NoteSilentDurationLeft = 0;
