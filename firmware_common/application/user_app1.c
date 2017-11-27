@@ -99,10 +99,11 @@ void UserApp1Initialize(void)
     UserApp1_StateMachine = UserApp1SM_Error;
   }
 
+
   
    PWMAudioSetFrequency(BUZZER1, 500);//neccessary?
   
-  u8 au8SongTitle[] = "Heart and Soul";
+  u8 au8SongTitle[] = "Game of Thrones";
 
   LCDCommand(LCD_CLEAR_CMD);
   LCDMessage(LINE1_START_ADDR, au8SongTitle);
@@ -147,23 +148,26 @@ State Machine Function Definitions
 static void UserApp1SM_Idle(void)
 {
   /* my song program 
-  doing GOT
+   *GOT
+  *USING "FN" full notes made errors because song is in 3/4. instead just make 3 quarter notes.
+  *first loop of the song works. after that it seems to play differenly
+  *need to edit LEDS too
   */
   
   
   //right hand
-   static u16 au16NotesRight[]    = {G5, C5, D5S, F5, G5, C5, D5S, F5,G5, C5, D5S, F5,G5, C5, D5S, F5,D5,D5,D5,D5,F5,A5S,F5,A5S,D5S,D5,G6, C6, D6S, F6, G6, C6, D6S, F6,G6, C6, D6S, F6,G6, C6, D6S, F6}; 
-  static u16 au16DurationRight[] = {QN, QN,   EN, EN, QN, QN, EN,  EN,QN, QN, EN, EN, QN, QN, EN, EN, FN,FN,FN,FN,FN,FN ,FN,FN,EN,EN,QN, QN,EN,   EN, QN, QN,  EN, EN,QN, QN,  EN, EN,QN, QN,  EN,EN};
-  static u16 au16NoteTypeRight[] = {RT, RT,   RT, RT, RT, RT,  RT, RT,RT, RT, RT, RT, RT, RT, RT, RT, HT,HT,HT,HT,HT,HT, HT,RT,RT, RT,RT,RT,  RT, RT, RT, RT,  RT, RT, RT, RT, RT, RT, RT, RT, RT, RT};
+   static u16 au16NotesRight[]    = {G5, C5, D5S, F5, G5, C5, D5S, F5,G5, C5, D5S, F5,G5, C5, D5S, F5,D5,D5,D5,D5,D5,D5,D5,D5,D5,D5,D5,D5,F5,F5,F5,A5S,A5S,A5S,F5,F5,F5,A5S,A5S,A5S,D5S,D5,G6, C6, D6S, F6, G6, C6, D6S, F6,G6, C6, D6S, F6,G6, C6, D6S, F6}; 
+  static u16 au16DurationRight[] = {QN, QN,   EN, EN, QN, QN, EN,  EN,QN, QN, EN, EN, QN, QN, EN, EN, QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN, QN, QN, QN,QN,QN,QN,  QN,QN, EN , EN,QN, QN, EN,  EN,  QN,QN, EN,  EN, QN,QN, EN,  EN, QN,QN, EN,  EN};
+  static u16 au16NoteTypeRight[] = {RT, RT,   RT, RT, RT, RT,  RT, RT,RT, RT, RT, RT, RT, RT, RT, RT, HT,HT,HT,HT,HT,HT,HT,HT,HT,HT,HT,HT,HT,HT,HT,HT, HT, HT, HT,HT,HT,HT,  HT,HT, RT, RT, RT, RT,  RT,  RT, RT, RT, RT, RT, RT, RT, RT, RT, RT, RT, RT, RT};
    static u8 u8IndexRight = 0;
   static u32 u32RightTimer = 0;
   static u16 u16CurrentDurationRight = 0;
   static u16 u16NoteSilentDurationRight = 0;
   static bool bNoteActiveNextRight = TRUE;
 //left hand
-   static u16 au16NotesLeft[]    = {G4,C4,G4,C4,D4, G3, A3S, C4,D4, G3, A3S, C4,D4, G3, A3S, C4,D4, G3, A3S, C4,F4,A3S,A3S,D4,D4S,F4,A3S,D4,D4S,C4,C4,C4,C4,C4};
-   static u16 au16DurationLeft[] = {FN,FN, FN,FN,QN ,QN, EN,  EN,QN ,QN, EN,  EN,QN ,QN, EN,  EN,QN ,QN, EN, EN,FN,QN,QN,  EN,EN, FN,FN,EN, EN ,QN,FN,FN,FN,FN};     
-  static u16 au16NoteTypeLeft[] = {RT, RT, RT,RT,RT,RT, RT,  RT,RT, RT, RT,  RT, RT, RT, RT, RT,RT, RT, RT, RT, HT,HT,RT,  RT,RT, HT, HT,RT,RT,HN, HN, HN,HN,HN};
+   static u16 au16NotesLeft[]    = {G4,G4,G4,C4,C4,C4,G4,G4,G4,C4,C4,C4,D4, G3, A3S, C4,D4, G3, A3S, C4,D4, G3, A3S, C4,D4, G3, A3S, C4,F4,F4,F4,A3S,A3S,D4,D4S,F4,F4,F4,A3S,A3S,A3S,D4S,D4,C4,C4,C4,C4,C4,C4,C4,C4,C4,C4,C4,C4};
+   static u16 au16DurationLeft[] = {QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN,QN ,QN, EN,  EN,QN ,QN, EN,  EN,QN ,QN, EN,  EN,QN ,QN, EN, EN, QN,QN,QN, QN,QN,  EN,EN,QN,QN,QN,QN, QN, QN, EN,EN,QN, QN, QN,QN,QN,QN,QN,QN,QN,QN,QN,QN};    
+  static u16 au16NoteTypeLeft[] = {HT,HT,HT, HT,HT,HT,HT,HT,HT,HT,HT,HT,RT, RT, RT,  RT,RT, RT, RT,  RT, RT, RT, RT, RT,RT, RT, RT, RT, HT,HT,HT, HT,RT, RT,RT, HT,HT,HT, HT,HT,HT,  RT,RT,HN, HN, HN,HN,HN,HN,HN,HN,HN,HN,HN,HN};
   static u8 u8IndexLeft = 0;
   static u32 u32LeftTimer = 0;
   static u16 u16CurrentDurationLeft = 0;
@@ -178,7 +182,10 @@ static void UserApp1SM_Idle(void)
   {
     u32RightTimer = G_u32SystemTime1ms;
     u8CurrentIndex = u8IndexRight;
-    
+    if (u8CurrentIndex ==0) 
+    {
+      u8CurrentIndex==0;
+    }
     /* Set up to play current note */
     if(bNoteActiveNextRight)
     {
@@ -217,11 +224,11 @@ static void UserApp1SM_Idle(void)
         /* LED control */
         switch(au16NotesRight[u8CurrentIndex])
         {
-          case D5:
+          case C5:
             LedOn(WHITE);
             break;
             
-          case E5:
+          case D5S:
             LedOn(PURPLE);
             break;
             
@@ -233,19 +240,19 @@ static void UserApp1SM_Idle(void)
             LedOn(CYAN);
             break;
             
-          case A5:
+          case C6:
             LedOn(GREEN);
             break;
             
-          case A5S:
+          case D6S:
             LedOn(YELLOW);
             break;
             
-          case C6:
+          case F6:
             LedOn(ORANGE);
             break;
             
-          case D6:
+          case G6:
             LedOn(RED);
             break;
             
@@ -300,7 +307,10 @@ static void UserApp1SM_Idle(void)
   {
     u32LeftTimer = G_u32SystemTime1ms;
     u8CurrentIndex = u8IndexLeft;
-    
+      if (u8CurrentIndex ==0) 
+    {
+      u8CurrentIndex==0;
+    }
     /* Set up to play current note */
     if(bNoteActiveNextLeft)
     {
