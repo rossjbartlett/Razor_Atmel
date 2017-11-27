@@ -152,18 +152,18 @@ static void UserApp1SM_Idle(void)
   
   
   //right hand
-   static u16 au16NotesRight[]    = {G4, C4, D4S, F4, G4, C4, D4S, F4,G4, C4, D4S, F4,G4, C4, D4S, F4,G4, C4, E4, F4,G4, C4, E4, F4,G4, C4, E4, F4,G4, C4, E4, F4}; 
-  static u16 au16DurationRight[] = {QN, QN,   EN, EN, QN, QN, EN,  EN,QN, QN, EN, EN, QN, QN, EN, EN, QN, QN, EN, EN,QN, QN, EN, EN,QN, QN, EN, EN,QN, QN, EN, EN};
-  static u16 au16NoteTypeRight[] = {RT, RT,   RT, RT, RT, RT,  RT, RT,RT, RT, RT, RT, RT, RT, RT, RT, RT, RT, RT, RT, RT, RT,RT, RT,RT, RT, RT, RT,RT, RT, RT, RT};
+   static u16 au16NotesRight[]    = {G5, C5, D5S, F5, G5, C5, D5S, F5,G5, C5, D5S, F5,G5, C5, D5S, F5,D5,D5,D5,D5,F5,A5S,F5,A5S,D5S,D5,G6, C6, D6S, F6, G6, C6, D6S, F6,G6, C6, D6S, F6,G6, C6, D6S, F6}; 
+  static u16 au16DurationRight[] = {QN, QN,   EN, EN, QN, QN, EN,  EN,QN, QN, EN, EN, QN, QN, EN, EN, FN,FN,FN,FN,FN,FN ,FN,FN,EN,EN,QN, QN,EN,   EN, QN, QN,  EN, EN,QN, QN,  EN, EN,QN, QN,  EN,EN};
+  static u16 au16NoteTypeRight[] = {RT, RT,   RT, RT, RT, RT,  RT, RT,RT, RT, RT, RT, RT, RT, RT, RT, HT,HT,HT,HT,HT,HT, HT,RT,RT, RT,RT,RT,  RT, RT, RT, RT,  RT, RT, RT, RT, RT, RT, RT, RT, RT, RT};
    static u8 u8IndexRight = 0;
   static u32 u32RightTimer = 0;
   static u16 u16CurrentDurationRight = 0;
   static u16 u16NoteSilentDurationRight = 0;
   static bool bNoteActiveNextRight = TRUE;
 //left hand
-   static u16 au16NotesLeft[]    = {G3,C3};
-  static u16 au16DurationLeft[] = {HN,HN};
-  static u16 au16NoteTypeLeft[] = {RT, RT};
+   static u16 au16NotesLeft[]    = {G4,C4,G4,C4,D4, G3, A3S, C4,D4, G3, A3S, C4,D4, G3, A3S, C4,D4, G3, A3S, C4,F4,A3S,A3S,D4,D4S,F4,A3S,D4,D4S,C4,C4,C4,C4,C4};
+   static u16 au16DurationLeft[] = {FN,FN, FN,FN,QN ,QN, EN,  EN,QN ,QN, EN,  EN,QN ,QN, EN,  EN,QN ,QN, EN, EN,FN,QN,QN,  EN,EN, FN,FN,EN, EN ,QN,FN,FN,FN,FN};     
+  static u16 au16NoteTypeLeft[] = {RT, RT, RT,RT,RT,RT, RT,  RT,RT, RT, RT,  RT, RT, RT, RT, RT,RT, RT, RT, RT, HT,HT,RT,  RT,RT, HT, HT,RT,RT,HN, HN, HN,HN,HN};
   static u8 u8IndexLeft = 0;
   static u32 u32LeftTimer = 0;
   static u16 u16CurrentDurationLeft = 0;
@@ -172,7 +172,7 @@ static void UserApp1SM_Idle(void)
   
   u8 u8CurrentIndex;
   
-  
+#if 1
   //RIGHT HAND 
    if(IsTimeUp(&u32RightTimer, (u32)u16CurrentDurationRight))
   {
@@ -291,7 +291,7 @@ static void UserApp1SM_Idle(void)
       }
     } /* end else if(bNoteActiveNextRight) */
   } /* end if(IsTimeUp(&u32RightTimer, (u32)u16CurrentDurationRight)) */
-  
+#endif
   
   
 #if 1
