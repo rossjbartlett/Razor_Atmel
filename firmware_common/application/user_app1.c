@@ -108,7 +108,7 @@ void UserApp1Initialize(void)
   LedOff(LCD_GREEN);
   LedOn(LCD_BLUE);
   
-  u8 au8SongTitle[] = "Game of Thrones";
+  u8 au8SongTitle[] = "Hello ATB!";
   
   LCDCommand(LCD_CLEAR_CMD);
   LCDMessage(LINE1_START_ADDR, au8SongTitle);
